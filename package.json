@@ -1,7 +1,7 @@
 {
-    "name": "rollup-ts-basic-template",
+    "name": "intro-tour",
     "version": "1.0.0",
-    "description": "rollup-ts-basic-template",
+    "description": "intro-tour",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "index.d.ts",
@@ -41,12 +41,12 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/supuwoerc/rollup-ts-basic-template.git"
+        "url": "git+https://github.com/supuwoerc/intro-tour.git"
     },
     "author": "QiMeng Zhang <zhangzhouou@gmail.com>(https://github.com/supuwoerc)",
-    "homepage": "https://supuwoerc.github.io/rollup-ts-basic-template",
+    "homepage": "https://supuwoerc.github.io/intro-tour",
     "bugs": {
-        "url": "https://github.com/supuwoerc/rollup-ts-basic-template/issues"
+        "url": "https://github.com/supuwoerc/intro-tour/issues"
     },
     "license": "MIT",
     "devDependencies": {
@@ -88,5 +88,9 @@
     },
     "volta": {
         "node": "16.14.2"
+    },
+    "dependencies": {
+        "intro.js": "^7.0.1",
+        "localforage": "^1.10.0"
     }
 }

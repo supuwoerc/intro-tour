@@ -1,4 +1,3 @@
-export const TEMPLATE_INFO = '使用GithubActions&TypeDoc部署文档'
 /**
  * @param a 数字1
  * @param b 数字2
