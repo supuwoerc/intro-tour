@@ -1,20 +1,10 @@
-# rollup-ts-basic-template
+# intro-tour
 
-:lollipop: 用于开发前端库的基础模板
+:lollipop: 基于intro开发的站点介绍工具
 
 ## 安装
 
-`git clone https://github.com/supuwoerc/rollup-ts-basic-template.git`
-
-## 启动
-
-### 安装依赖
-
-`pnpm install`
-
-### 启动项目
-
-`pnpm run dev`
+`pnpm add @supuwoerc/intro-tour`
 
 ## 维护者
 
@@ -22,7 +12,7 @@
 
 ## 如何贡献
 
-非常欢迎你的加入！[提一个 Issue](https://github.com/supuwoerc/rollup-ts-basic-template/issues/new) 或者提交一个 Pull Request。
+非常欢迎你的加入！[提一个 Issue](https://github.com/supuwoerc/intro-tour/issues/new) 或者提交一个 Pull Request。
 
 ## 使用许可
 
