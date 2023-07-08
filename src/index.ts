@@ -1,8 +1,19 @@
-/**
- * @param a 数字1
- * @param b 数字2
- * @returns 数字1和数字2的求和结果
- */
-export function addNumber(a: number, b: number) {
-    return a + b
+import logUtil from '@/utils/log'
+
+interface InitOptions {
+    errorHandler?: (error: Error) => void
+}
+
+export default class IntroTour {
+    readonly errorHandler: (error: Error) => void = (error) => {
+        logUtil.error(error)
+    }
+
+    constructor(options: InitOptions = {}) {
+        const { errorHandler } = options
+        if (errorHandler) {
+            this.errorHandler = errorHandler
+        }
+        logUtil.log('plugin initialization is complete')
+    }
 }

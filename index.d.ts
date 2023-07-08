@@ -1,9 +1,9 @@
-declare const TEMPLATE_INFO = "\u4F7F\u7528GithubActions&TypeDoc\u90E8\u7F72\u6587\u6863";
-/**
- * @param a 数字1
- * @param b 数字2
- * @returns 数字1和数字2的求和结果
- */
-declare function addNumber(a: number, b: number): number;
+interface InitOptions {
+    errorHandler?: (error: Error) => void;
+}
+declare class IntroTour {
+    readonly errorHandler: (error: Error) => void;
+    constructor(options?: InitOptions);
+}
 
-export { TEMPLATE_INFO, addNumber };
+export { IntroTour as default };
