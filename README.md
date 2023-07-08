@@ -6,6 +6,10 @@
 
 `pnpm add @supuwoerc/intro-tour`
 
+## 方法文档
+
+点击访问：[方法文档-来自TypeDoc](https://supuwoerc.github.io/intro-tour/index.html)
+
 ## 维护者
 
 [@Supuwoerc](https://github.com/supuwoerc)
