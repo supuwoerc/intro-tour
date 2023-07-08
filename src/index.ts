@@ -5,7 +5,7 @@ interface InitOptions {
 }
 
 export default class IntroTour {
-    readonly errorHandler: (error: Error) => void = (error) => {
+    readonly errorHandler = (error: Error) => {
         logUtil.error(error)
     }
 
