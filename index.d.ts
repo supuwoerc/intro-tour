@@ -1,9 +1,15 @@
 interface InitOptions {
     errorHandler?: (error: Error) => void;
+    warnHandler?: (message: string) => void;
 }
 declare class IntroTour {
-    readonly errorHandler: (error: Error) => void;
+    private readonly errorHandler;
+    private readonly warnHandler;
+    private range;
     constructor(options?: InitOptions);
+    initEvent: () => Promise<void>;
+    private onMouseup;
+    private showTooltip;
 }
 
 export { IntroTour as default };
