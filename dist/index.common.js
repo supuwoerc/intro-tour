@@ -1,0 +1,1 @@
+"use strict";const r="[intro-tour]";var o=(...o)=>{console.log(r,...o)},e=(...o)=>{console.error(r,...o)};module.exports=class{errorHandler=r=>{e(r)};constructor(r={}){const{errorHandler:e}=r;e&&(this.errorHandler=e),o("plugin initialization is complete")}};

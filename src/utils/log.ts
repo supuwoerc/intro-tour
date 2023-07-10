@@ -1,18 +1,17 @@
 /* eslint-disable no-console */
-import json from '../../package.json'
 
-export const LOG_PREFIX = `[${json.name}-${json.version}]`
+const prefix = `[intro-tour]`
 
 export const log = (...data: any[]) => {
-    console.log(LOG_PREFIX, ...data)
+    console.log(prefix, ...data)
 }
 
 export const error = (...data: any[]) => {
-    console.error(LOG_PREFIX, ...data)
+    console.error(prefix, ...data)
 }
 
 export const warn = (...data: any[]) => {
-    console.warn(LOG_PREFIX, ...data)
+    console.warn(prefix, ...data)
 }
 
 export default {

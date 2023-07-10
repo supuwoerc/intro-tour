@@ -1,0 +1,1 @@
+const r="[intro-tour]";var o=(...o)=>{console.log(r,...o)},e=(...o)=>{console.error(r,...o)};class n{errorHandler=r=>{e(r)};constructor(r={}){const{errorHandler:e}=r;e&&(this.errorHandler=e),o("plugin initialization is complete")}}export{n as default};
