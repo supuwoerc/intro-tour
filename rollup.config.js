@@ -19,8 +19,7 @@ const plugins = [
     babel({
         babelrc: false,
         babelHelpers: 'bundled',
-        // presets: [['env', { modules: false }]],
-        presets: ['@babel/preset-react'],
+        presets: [['env', { modules: false }]],
     }),
     resolve({
         preferBuiltins: true,

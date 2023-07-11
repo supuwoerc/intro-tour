@@ -16,6 +16,8 @@ export default class IntroTour {
 
     private range: Range | null = null
 
+    private root: HTMLElement = document.createElement('div')
+
     constructor(options: InitOptions = {}) {
         const { errorHandler, warnHandler } = options
         if (errorHandler) {
@@ -24,16 +26,17 @@ export default class IntroTour {
         if (warnHandler) {
             this.warnHandler = warnHandler
         }
-        this.initEvent().then(() => {
-            logUtil.log('plugin initialization is complete!')
-        })
+        this.initEvent()
+        this.initTooltip()
+        logUtil.log('plugin initialization is complete!')
     }
 
-    initEvent = (): Promise<void> => {
-        return new Promise((resolve) => {
-            document.addEventListener('mouseup', this.onMouseup)
-            resolve()
-        })
+    private initTooltip = () => {
+        document.body.appendChild(this.root)
+    }
+
+    private initEvent = () => {
+        document.addEventListener('mouseup', this.onMouseup)
     }
 
     private onMouseup = () => {
