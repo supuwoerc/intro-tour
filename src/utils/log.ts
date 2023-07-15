@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-const prefix = `[intro-tour]`
+const prefix = `[intro-tour]:`
 
 export const log = (...data: any[]) => {
     console.log(prefix, ...data)

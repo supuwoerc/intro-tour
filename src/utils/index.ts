@@ -1,3 +1,4 @@
+import logUtil from '@/utils/log'
 /**
  * 产生uuid
  * @returns uuid
@@ -13,10 +14,14 @@ export function uuid() {
  */
 export function domParse(...templates: string[]) {
     const documentFragment = document.createDocumentFragment()
-    for (let index = 0; index < templates.length; index += 1) {
-        const template = templates[index]
-        const contextualFraement = document.createRange().createContextualFragment(template)
-        documentFragment.appendChild(contextualFraement)
+    try {
+        for (let index = 0; index < templates.length; index += 1) {
+            const template = templates[index]
+            const contextualFraement = document.createRange().createContextualFragment(template)
+            documentFragment.appendChild(contextualFraement)
+        }
+    } catch (error) {
+        logUtil.error(error)
     }
     return documentFragment
 }

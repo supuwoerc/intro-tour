@@ -1,5 +1,6 @@
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
+import { domParse } from './utils'
 
 interface InitOptions {
     errorHandler?: (error: Error) => void
@@ -37,6 +38,9 @@ export default class IntroTour {
     }
 
     private initTooltip = () => {
+        logUtil.log(tooltip)
+        this.root.appendChild(domParse(tooltip))
+        this.root.className = 'intro-tour-outer-container'
         document.body.appendChild(this.root)
     }
 
