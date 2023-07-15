@@ -11,6 +11,7 @@ import { terser } from 'rollup-plugin-terser'
 import cleaner from 'rollup-plugin-cleaner'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import html from 'rollup-plugin-html'
 
 const entries = ['src/index.ts']
 
@@ -38,6 +39,15 @@ const plugins = [
     esbuild(),
     terser(),
     cleaner({ targets: ['./dist/'], silent: false }),
+    html({
+        include: '**/*.html',
+        htmlMinifierOptions: {
+            collapseWhitespace: true,
+            collapseBooleanAttributes: true,
+            conservativeCollapse: true,
+            minifyJS: true,
+        },
+    }),
 ]
 
 export default [
