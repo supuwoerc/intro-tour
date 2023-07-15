@@ -1,4 +1,5 @@
 import logUtil from '@/utils/log'
+import tooltip from '@/template/tooltip.html'
 
 interface InitOptions {
     errorHandler?: (error: Error) => void
@@ -19,6 +20,9 @@ export default class IntroTour {
     private root: HTMLElement = document.createElement('div')
 
     constructor(options: InitOptions = {}) {
+        if (window.introTour) {
+            throw new Error('plugin has been initialized. Do not call it again')
+        }
         const { errorHandler, warnHandler } = options
         if (errorHandler) {
             this.errorHandler = errorHandler
@@ -28,6 +32,7 @@ export default class IntroTour {
         }
         this.initEvent()
         this.initTooltip()
+        window.introTour = this
         logUtil.log('plugin initialization is complete!')
     }
 
