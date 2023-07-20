@@ -16,6 +16,15 @@ import html from 'rollup-plugin-html'
 const entries = ['src/index.ts']
 
 const plugins = [
+    html({
+        include: '**/*.html',
+        htmlMinifierOptions: {
+            collapseWhitespace: false,
+            collapseBooleanAttributes: false,
+            conservativeCollapse: false,
+            minifyJS: false,
+        },
+    }),
     eslint(),
     babel({
         babelrc: false,
@@ -39,15 +48,6 @@ const plugins = [
     esbuild(),
     terser(),
     cleaner({ targets: ['./dist/'], silent: false }),
-    html({
-        include: '**/*.html',
-        htmlMinifierOptions: {
-            collapseWhitespace: true,
-            collapseBooleanAttributes: true,
-            conservativeCollapse: true,
-            minifyJS: true,
-        },
-    }),
 ]
 
 export default [
