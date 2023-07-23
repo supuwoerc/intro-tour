@@ -1,6 +1,7 @@
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
 import { domParse } from './utils'
+import './styles/tooltip.scss'
 
 interface InitOptions {
     errorHandler?: (error: Error) => void

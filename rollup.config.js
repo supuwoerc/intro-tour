@@ -12,6 +12,7 @@ import cleaner from 'rollup-plugin-cleaner'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import html from 'rollup-plugin-html'
+import postcss from 'rollup-plugin-postcss'
 
 const entries = ['src/index.ts']
 
@@ -25,11 +26,15 @@ const plugins = [
             minifyJS: false,
         },
     }),
+    postcss({
+        extensions: ['.scss'],
+    }),
     eslint(),
+    typescript(),
     babel({
         babelrc: false,
         babelHelpers: 'bundled',
-        presets: [['env', { modules: false }]],
+        presets: ['@babel/preset-env'],
     }),
     resolve({
         preferBuiltins: true,
@@ -43,7 +48,6 @@ const plugins = [
         ],
     }),
     json(),
-    typescript(),
     commonjs(),
     esbuild(),
     terser(),

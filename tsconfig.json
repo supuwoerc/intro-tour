@@ -5,6 +5,7 @@
         "lib": ["esnext", "dom"],
         "moduleResolution": "node",
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "strict": true,
         "strictNullChecks": true,
         "resolveJsonModule": true,
@@ -14,7 +15,8 @@
         "jsx": "preserve",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
+        "rootDir": "src"
     },
     "include": ["./src/**/*"]
 }
