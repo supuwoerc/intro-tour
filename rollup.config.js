@@ -1,5 +1,3 @@
-import dts from 'rollup-plugin-dts'
-import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import alias from '@rollup/plugin-alias'
@@ -13,6 +11,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import html from 'rollup-plugin-html'
 import postcss from 'rollup-plugin-postcss'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 const entries = ['src/index.ts']
 
@@ -26,9 +25,7 @@ const plugins = [
             minifyJS: false,
         },
     }),
-    postcss({
-        extensions: ['.scss'],
-    }),
+    postcss(),
     eslint(),
     typescript(),
     babel({
@@ -36,7 +33,7 @@ const plugins = [
         babelHelpers: 'bundled',
         presets: ['@babel/preset-env'],
     }),
-    resolve({
+    nodeResolve({
         preferBuiltins: true,
     }),
     alias({
@@ -74,14 +71,5 @@ export default [
         ],
         external: [],
         plugins,
-    })),
-    ...entries.map((input) => ({
-        input,
-        output: {
-            file: input.replace('src/', '').replace('.ts', '.d.ts'),
-            format: 'esm',
-        },
-        external: [],
-        plugins: [dts({ respectExternal: true })],
     })),
 ]
