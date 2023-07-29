@@ -34,19 +34,26 @@ export default class IntroTour {
         }
         this.initEvent()
         this.initTooltip()
-        window.introTour = this
         logUtil.log('plugin initialization is complete!')
+        window.introTour = this
     }
 
     private initTooltip = () => {
-        logUtil.log(tooltip)
         this.root.appendChild(domParse(tooltip))
-        this.root.className = 'intro-tour-outer-container'
+        this.root.classList.add('intro-tour-outer-container')
         document.body.appendChild(this.root)
     }
 
     private initEvent = () => {
+        document.addEventListener('mousedown', this.onMousedown)
         document.addEventListener('mouseup', this.onMouseup)
+        this.root.addEventListener('click', this.onMenuClick)
+    }
+
+    private onMenuClick = (e: MouseEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
+        logUtil.error(e)
     }
 
     private onMouseup = () => {
@@ -62,8 +69,15 @@ export default class IntroTour {
         }
     }
 
+    private onMousedown = () => {
+        this.root.classList.remove('show')
+    }
+
     private showTooltip = (range: Range) => {
         const rect = range.getBoundingClientRect()
-        logUtil.log(rect)
+        const { left, top } = rect
+        this.root.classList.add('show')
+        this.root.style.left = `${left}px`
+        this.root.style.top = `${top}px`
     }
 }

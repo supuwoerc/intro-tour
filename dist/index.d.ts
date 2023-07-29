@@ -11,7 +11,9 @@ export default class IntroTour {
     constructor(options?: InitOptions);
     private initTooltip;
     private initEvent;
+    private onMenuClick;
     private onMouseup;
+    private onMousedown;
     private showTooltip;
 }
 export {};
