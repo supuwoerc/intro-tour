@@ -9,6 +9,15 @@ interface InitOptions {
 }
 
 export default class IntroTour {
+    private tooltipOffset = [0, 16]
+
+    private overflowOffset = [0, 0]
+
+    private tooltipStyle = {
+        width: 200,
+        height: 32,
+    }
+
     private readonly errorHandler = (error: Error) => {
         logUtil.error(error)
     }
@@ -41,6 +50,12 @@ export default class IntroTour {
     private initTooltip = () => {
         this.root.appendChild(domParse(tooltip))
         this.root.classList.add('intro-tour-outer-container')
+        const { width, height } = this.tooltipStyle
+        const [ox, oy] = this.overflowOffset
+        this.root.style.setProperty('--intro-tour-width', `${width}px`)
+        this.root.style.setProperty('--intro-tour-height', `${height}px`)
+        this.root.style.setProperty('--intro-tour-ox', `${ox}px`)
+        this.root.style.setProperty('--intro-tour-oy', `${oy}px`)
         document.body.appendChild(this.root)
     }
 
@@ -75,9 +90,13 @@ export default class IntroTour {
 
     private showTooltip = (range: Range) => {
         const rect = range.getBoundingClientRect()
-        const { left, top } = rect
+        const { left, top, width } = rect
+        const [leftOffset, topOffset] = this.tooltipOffset
+        const { width: _width, height: _height } = this.tooltipStyle
+        const positionLeft = left + width / 2 - _width / 2 - leftOffset
+        const positionTop = top - _height - topOffset
+        this.root.style.left = `${positionLeft}px`
+        this.root.style.top = `${positionTop}px`
         this.root.classList.add('show')
-        this.root.style.left = `${left}px`
-        this.root.style.top = `${top}px`
     }
 }

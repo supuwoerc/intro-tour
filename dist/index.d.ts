@@ -4,6 +4,9 @@ interface InitOptions {
     warnHandler?: (message: string) => void;
 }
 export default class IntroTour {
+    private tooltipOffset;
+    private overflowOffset;
+    private tooltipStyle;
     private readonly errorHandler;
     private readonly warnHandler;
     private range;
