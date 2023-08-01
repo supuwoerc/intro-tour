@@ -12,6 +12,8 @@ import { fileURLToPath } from 'url'
 import html from 'rollup-plugin-html'
 import postcss from 'rollup-plugin-postcss'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
+import atImport from 'postcss-import'
+import url from 'postcss-url'
 
 const entries = ['src/index.ts']
 
@@ -25,7 +27,9 @@ const plugins = [
             minifyJS: false,
         },
     }),
-    postcss(),
+    postcss({
+        plugins: [atImport(), url({ url: 'inline' })],
+    }),
     eslint(),
     typescript(),
     babel({

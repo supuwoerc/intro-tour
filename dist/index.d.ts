@@ -1,12 +1,11 @@
 import './styles/tooltip.scss';
+import 'tippy.js/dist/tippy.css';
 interface InitOptions {
     errorHandler?: (error: Error) => void;
     warnHandler?: (message: string) => void;
 }
 export default class IntroTour {
-    private tooltipOffset;
-    private overflowOffset;
-    private tooltipStyle;
+    private tippyInstance;
     private readonly errorHandler;
     private readonly warnHandler;
     private range;
@@ -14,7 +13,6 @@ export default class IntroTour {
     constructor(options?: InitOptions);
     private initTooltip;
     private initEvent;
-    private onMenuClick;
     private onMouseup;
     private onMousedown;
     private showTooltip;
