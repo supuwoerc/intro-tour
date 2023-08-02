@@ -9,10 +9,13 @@ import 'tippy.js/animations/scale.css'
 interface InitOptions {
     errorHandler?: (error: Error) => void
     warnHandler?: (message: string) => void
+    successHandler?: (message: string) => void
 }
 
 export default class IntroTour {
     private tippyInstance: Instance | null = null
+
+    private customEvents = ['annotate', 'mark', 'copy']
 
     private readonly errorHandler = (error: Error) => {
         logUtil.error(error)
@@ -22,20 +25,29 @@ export default class IntroTour {
         logUtil.warn(message)
     }
 
+    private readonly successHandler = (message: string) => {
+        logUtil.log(message)
+    }
+
     private range: Range | null = null
 
     private root: HTMLElement = document.createElement('div')
+
+    private tools: HTMLElement = document.createElement('div')
 
     constructor(options: InitOptions = {}) {
         if (window.introTour) {
             throw new Error('plugin has been initialized. Do not call it again')
         }
-        const { errorHandler, warnHandler } = options
+        const { errorHandler, warnHandler, successHandler } = options
         if (errorHandler) {
             this.errorHandler = errorHandler
         }
         if (warnHandler) {
             this.warnHandler = warnHandler
+        }
+        if (successHandler) {
+            this.successHandler = successHandler
         }
         this.initEvent()
         this.initTooltip()
@@ -45,17 +57,17 @@ export default class IntroTour {
 
     private initTooltip = () => {
         this.root.classList.add('intro-tour-outer-container')
-        const tools = domParse(tooltip)
+        this.tools.appendChild(domParse(tooltip))
         document.body.appendChild(this.root)
         this.tippyInstance = tippy(this.root, {
-            content: tools,
+            content: this.tools,
             arrow: true,
             placement: 'top',
             interactive: true,
             animation: 'scale',
             trigger: 'manual',
+            hideOnClick: false,
         })
-        this.tippyInstance.hide()
     }
 
     private initEvent = () => {
@@ -77,7 +89,14 @@ export default class IntroTour {
     }
 
     private onMousedown = (e: MouseEvent) => {
-        logUtil.log(e.target)
+        const target = e.target as HTMLElement
+        const isInnerChild = this.tools.contains(target)
+        if (isInnerChild) {
+            const method = target.dataset?.method ?? ''
+            if (this.customEvents.includes(method)) {
+                this[method]()
+            }
+        }
         this.tippyInstance?.hide()
         this.root.style.setProperty('--intro-tour-z', `-1`)
     }
@@ -95,5 +114,6 @@ export default class IntroTour {
 
     private copy = () => {
         document.execCommand('copy')
+        this.successHandler('复制成功')
     }
 }
