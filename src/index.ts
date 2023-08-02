@@ -4,6 +4,7 @@ import tooltip from '@/template/tooltip.html'
 import { domParse } from './utils'
 import './styles/tooltip.scss'
 import 'tippy.js/dist/tippy.css'
+import 'tippy.js/animations/scale.css'
 
 interface InitOptions {
     errorHandler?: (error: Error) => void
@@ -44,12 +45,15 @@ export default class IntroTour {
 
     private initTooltip = () => {
         this.root.classList.add('intro-tour-outer-container')
+        const tools = domParse(tooltip)
         document.body.appendChild(this.root)
         this.tippyInstance = tippy(this.root, {
-            content: domParse(tooltip),
+            content: tools,
             arrow: true,
             placement: 'top',
             interactive: true,
+            animation: 'scale',
+            trigger: 'manual',
         })
         this.tippyInstance.hide()
     }
@@ -72,7 +76,8 @@ export default class IntroTour {
         }
     }
 
-    private onMousedown = () => {
+    private onMousedown = (e: MouseEvent) => {
+        logUtil.log(e.target)
         this.tippyInstance?.hide()
         this.root.style.setProperty('--intro-tour-z', `-1`)
     }
@@ -86,5 +91,9 @@ export default class IntroTour {
         this.root.style.setProperty('--intro-tour-h', `${height}px`)
         this.root.style.setProperty('--intro-tour-z', `1`)
         this.tippyInstance?.show()
+    }
+
+    private copy = () => {
+        document.execCommand('copy')
     }
 }

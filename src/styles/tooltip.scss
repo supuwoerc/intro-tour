@@ -8,10 +8,15 @@
     z-index: var(--intro-tour-z);
     background: rgab(0,0,0,.7);
     cursor: pointer;
-    .tool-content{
+}
+.tool-content{
+    .iconfont{
+        font-size: 24px;
+        padding: 0 2px;
         cursor: pointer;
     }
 }
+
 ::selection {   
     background:orange;    
 }   

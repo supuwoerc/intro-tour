@@ -1,5 +1,6 @@
 import './styles/tooltip.scss';
 import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/scale.css';
 interface InitOptions {
     errorHandler?: (error: Error) => void;
     warnHandler?: (message: string) => void;
@@ -16,5 +17,6 @@ export default class IntroTour {
     private onMouseup;
     private onMousedown;
     private showTooltip;
+    private copy;
 }
 export {};
