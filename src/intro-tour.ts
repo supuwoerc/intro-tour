@@ -3,32 +3,64 @@ import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
 import { domParse } from './utils'
 
-interface InitOptions {
+export interface InitOptions {
     errorHandler?: (error: Error) => void
     warnHandler?: (message: string) => void
     successHandler?: (message: string) => void
 }
+/**
+ * @class
+ */
 export default class IntroTour {
+    /**
+     * @default null
+     * 气泡实例
+     */
     private tippyInstance: Instance | null = null
 
-    private customEvents = ['annotate', 'mark', 'copy']
+    /**
+     * @readonly
+     * @description 按钮注册的方法
+     */
+    private readonly customEvents = ['annotate', 'mark', 'copy']
 
+    /**
+     * 发生错误时的回调方法
+     * @param error 错误
+     */
     private readonly errorHandler = (error: Error) => {
         logUtil.error(error)
     }
 
+    /**
+     * 发生警告时的回调方法
+     * @param message 警告消息
+     */
     private readonly warnHandler = (message: string) => {
         logUtil.warn(message)
     }
 
+    /**
+     * 操作成功时的回调方法
+     * @param message 成功消息
+     */
     private readonly successHandler = (message: string) => {
         logUtil.log(message)
     }
 
+    /**
+     * @description 选中的range
+     */
     private range: Range | null = null
 
+    /**
+     * @description 气泡依赖的元素
+     */
     private root: HTMLElement = document.createElement('div')
 
+    /**
+     * @description 气泡内容依赖的元素
+     */
     private tools: HTMLElement = document.createElement('div')
 
     constructor(options: InitOptions = {}) {

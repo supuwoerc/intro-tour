@@ -1,4 +1,4 @@
 {
-  "entryPoints": ["./src"],
-  "out": "docs"
+    "entryPoints": ["./src/intro-tour.ts"],
+    "out": "docs"
 }
