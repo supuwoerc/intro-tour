@@ -142,6 +142,16 @@ export default class IntroTour {
 
     private copy = () => {
         document.execCommand('copy')
-        this.successHandler('复制成功')
+        this.successHandler('copy')
+    }
+
+    // TODO:完善功能
+    private annotate = () => {
+        this.successHandler('annotate')
+    }
+
+    // TODO:完善功能
+    private mark = () => {
+        this.successHandler('mark')
     }
 }
