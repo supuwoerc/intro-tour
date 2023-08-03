@@ -1,12 +1,9 @@
-import './styles/tooltip.scss';
-import 'tippy.js/dist/tippy.css';
-import 'tippy.js/animations/scale.css';
 interface InitOptions {
     errorHandler?: (error: Error) => void;
     warnHandler?: (message: string) => void;
     successHandler?: (message: string) => void;
 }
-export default class IntroTour {
+declare class IntroTour {
     private tippyInstance;
     private customEvents;
     private readonly errorHandler;
@@ -23,4 +20,5 @@ export default class IntroTour {
     private showTooltip;
     private copy;
 }
-export {};
+
+export { IntroTour as default };

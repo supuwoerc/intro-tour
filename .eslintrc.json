@@ -25,5 +25,13 @@
                 "moduleDirectory": ["node_modules", "./src"]
             }
         }
-    }
+    },
+    "overrides": [
+        {
+            "files": ["rollup.config.ts"],
+            "rules": {
+                "import/no-extraneous-dependencies": "off"
+            }
+        }
+    ]
 }

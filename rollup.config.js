@@ -14,6 +14,7 @@ import postcss from 'rollup-plugin-postcss'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import atImport from 'postcss-import'
 import url from 'postcss-url'
+import dts from 'rollup-plugin-dts'
 
 const entries = ['src/index.ts']
 
@@ -51,8 +52,6 @@ const plugins = [
     json(),
     commonjs(),
     esbuild(),
-    terser(),
-    cleaner({ targets: ['./dist/'], silent: false }),
 ]
 
 export default [
@@ -74,6 +73,16 @@ export default [
             },
         ],
         external: [],
-        plugins,
+        plugins: [...plugins, terser(), cleaner({ targets: ['./dist/'], silent: false })],
     })),
+    {
+        input: 'src/intro-tour.ts',
+        output: [
+            {
+                file: 'dist/index.d.ts',
+                format: 'es',
+            },
+        ],
+        plugins: [dts()],
+    },
 ]
