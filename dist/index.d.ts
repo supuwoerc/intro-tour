@@ -51,8 +51,8 @@ declare class IntroTour {
     private onMousedown;
     private showTooltip;
     private copy;
-    private annotate;
     private mark;
+    private annotate;
 }
 
 export { InitOptions, IntroTour as default };

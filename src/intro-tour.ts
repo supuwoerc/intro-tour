@@ -146,12 +146,12 @@ export default class IntroTour {
     }
 
     // TODO:完善功能
-    private annotate = () => {
-        this.successHandler('annotate')
+    private mark = () => {
+        this.successHandler('mark')
     }
 
     // TODO:完善功能
-    private mark = () => {
-        this.successHandler('mark')
+    private annotate = () => {
+        this.successHandler('annotate')
     }
 }
