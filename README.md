@@ -10,9 +10,9 @@
 
 `pnpm add @supuwoerc/intro-tour`
 
-## 直接引入umd文件
+## 直接引入umd文件（dist目录下）
 
-`<script src="http://raw.githack.com/supuwoerc/intro-tour/main/dist/index.umd.js"></script>`
+`<script src="https://raw.githack.com/supuwoerc/intro-tour/main/dist/index.umd.js"></script>`
 
 ## 方法文档
 
