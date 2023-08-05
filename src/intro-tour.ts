@@ -148,13 +148,12 @@ export default class IntroTour {
                 return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
             },
         })
-        const { currentNode } = treeWalker
-        if (currentNode.nodeType === Node.TEXT_NODE && range.intersectsNode(currentNode)) {
-            textNodes.push(currentNode)
-        }
-        while (treeWalker.nextNode()) {
-            textNodes.push(treeWalker.currentNode)
-        }
+        do {
+            const { currentNode } = treeWalker
+            if (currentNode.nodeType === Node.TEXT_NODE && range.intersectsNode(currentNode)) {
+                textNodes.push(currentNode)
+            }
+        } while (treeWalker.nextNode())
         return textNodes
     }
 
