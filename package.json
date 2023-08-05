@@ -13,6 +13,7 @@
         "build:tsc": "npx tsc",
         "dev": "rollup -c --watch",
         "doc": "typedoc --options typedoc.json",
+        "demo": "typedoc --options typedoc.json && node ./script/copyFile.js",
         "test": "jest --watch",
         "test:commit": "jest",
         "coverage": "jest --coverage",

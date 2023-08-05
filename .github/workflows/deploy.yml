@@ -26,7 +26,7 @@ jobs:
               run: pnpm install
 
             - name: Generate typedoc documentation
-              run: pnpm run doc
+              run: pnpm run demo
 
             - name: Deploy to GitHub Pages
               uses: JamesIves/github-pages-deploy-action@4.1.0

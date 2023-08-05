@@ -61,7 +61,7 @@ export default [
             {
                 file: input.replace('src/', 'dist/').replace('.ts', '.umd.js'),
                 format: 'umd',
-                name: 'template.min.js',
+                name: 'IntroTour',
             },
             {
                 file: input.replace('src/', 'dist/').replace('.ts', '.esm.js'),
