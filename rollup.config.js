@@ -15,6 +15,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import atImport from 'postcss-import'
 import url from 'postcss-url'
 import dts from 'rollup-plugin-dts'
+import replace from '@rollup/plugin-replace'
 
 const entries = ['src/index.ts']
 
@@ -52,6 +53,10 @@ const plugins = [
     json(),
     commonjs(),
     esbuild(),
+    replace({
+        preventAssignment: true,
+        'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
 ]
 
 export default [
