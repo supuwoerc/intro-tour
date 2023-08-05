@@ -2,6 +2,13 @@
 
 :lollipop: 基于intro开发的站点介绍工具，可以用作测试的场景还原和步骤教学
 
+## DEMO
+
+点击访问：[demo-来自workflow](https://supuwoerc.github.io/intro-tour/demo.html)
+
+
+`pnpm add @supuwoerc/intro-tour`
+
 ## 安装
 
 `pnpm add @supuwoerc/intro-tour`
