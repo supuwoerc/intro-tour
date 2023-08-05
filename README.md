@@ -6,12 +6,13 @@
 
 点击访问：[demo-来自workflow](https://supuwoerc.github.io/intro-tour/demo.html)
 
+## 通过包管理器安装
 
 `pnpm add @supuwoerc/intro-tour`
 
-## 安装
+## 直接引入umd文件
 
-`pnpm add @supuwoerc/intro-tour`
+`<script src="http://raw.githack.com/supuwoerc/intro-tour/main/dist/index.umd.js"></script>`
 
 ## 方法文档
 
