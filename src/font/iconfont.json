@@ -6,25 +6,46 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "8776692",
-      "name": "message",
-      "font_class": "icon-test",
-      "unicode": "e635",
-      "unicode_decimal": 58933
+      "icon_id": "4766481",
+      "name": "file-copy",
+      "font_class": "file-copy",
+      "unicode": "e7bc",
+      "unicode_decimal": 59324
     },
     {
-      "icon_id": "8776843",
-      "name": "edit",
-      "font_class": "icon-test1",
-      "unicode": "e63d",
-      "unicode_decimal": 58941
+      "icon_id": "6598316",
+      "name": "comment",
+      "font_class": "comment",
+      "unicode": "e8e8",
+      "unicode_decimal": 59624
     },
     {
-      "icon_id": "8777224",
-      "name": "copy",
-      "font_class": "icon-test2",
-      "unicode": "e64c",
-      "unicode_decimal": 58956
+      "icon_id": "4767078",
+      "name": "bold",
+      "font_class": "bold",
+      "unicode": "e7f7",
+      "unicode_decimal": 59383
+    },
+    {
+      "icon_id": "4767079",
+      "name": "font-colors",
+      "font_class": "font-colors",
+      "unicode": "e7f8",
+      "unicode_decimal": 59384
+    },
+    {
+      "icon_id": "4767085",
+      "name": "underline",
+      "font_class": "underline",
+      "unicode": "e7fa",
+      "unicode_decimal": 59386
+    },
+    {
+      "icon_id": "4767106",
+      "name": "bg-colors",
+      "font_class": "bg-colors",
+      "unicode": "e800",
+      "unicode_decimal": 59392
     }
   ]
 }

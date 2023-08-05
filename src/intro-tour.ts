@@ -2,16 +2,18 @@ import tippy, { Instance } from 'tippy.js'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
 import { domParse } from './utils'
+import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod } from './constant'
 
-export interface InitOptions {
-    errorHandler?: (error: Error) => void
-    warnHandler?: (message: string) => void
-    successHandler?: (message: string) => void
-}
 /**
  * @class
  */
 export default class IntroTour {
+    /**
+     * @default ""
+     * 自定义className
+     */
+    private className = ''
+
     /**
      * @default null
      * 气泡实例
@@ -22,7 +24,8 @@ export default class IntroTour {
      * @readonly
      * @description 按钮注册的方法
      */
-    private readonly customEvents = ['annotate', 'mark', 'copy']
+    // TODO:light 背景高亮
+    private readonly customEvents = ActionType
 
     /**
      * 发生错误时的回调方法
@@ -67,7 +70,7 @@ export default class IntroTour {
         if (window.introTour) {
             throw new Error('plugin has been initialized. Do not call it again')
         }
-        const { errorHandler, warnHandler, successHandler } = options
+        const { errorHandler, warnHandler, successHandler, className } = options
         if (errorHandler) {
             this.errorHandler = errorHandler
         }
@@ -76,6 +79,9 @@ export default class IntroTour {
         }
         if (successHandler) {
             this.successHandler = successHandler
+        }
+        if (className) {
+            this.className = className
         }
         this.initEvent()
         this.initTooltip()
@@ -118,10 +124,11 @@ export default class IntroTour {
 
     private onMousedown = (e: MouseEvent) => {
         const target = e.target as HTMLElement
+        const method = target.dataset?.method ?? ''
         const isInnerChild = this.tools.contains(target)
-        if (isInnerChild) {
-            const method = target.dataset?.method ?? ''
-            if (this.customEvents.includes(method)) {
+        const isMarkCell = method === 'introTourMarkCancel'
+        if (isInnerChild || isMarkCell) {
+            if (this.customEvents[method]) {
                 this[method]()
             }
         }
@@ -157,24 +164,21 @@ export default class IntroTour {
         return textNodes
     }
 
-    private replaceTextNodes(node: Node, start: number, end: number) {
+    private replaceTextNodes(node: Node, start: number, end: number, type: ActionType) {
         const fragment = document.createDocumentFragment()
+        const targetClass = ReplaceNodeClass[type]
+        const targetMethod = ReplaceNodeMethod[type]
         let startNode: Node | null = null
-        let midNodes: HTMLSpanElement[] | null = null
+        let midNode: HTMLSpanElement | null = null
         let endNode: Node | null = null
         if (start !== 0 && node.nodeValue) {
             startNode = document.createTextNode(node.nodeValue.slice(0, start))
         }
         if (node.nodeValue) {
-            midNodes = node.nodeValue
-                .slice(start, end)
-                .split('')
-                .map((text) => {
-                    const textNode = document.createElement('span')
-                    textNode.className = 'intro-tour-mark-text'
-                    textNode.textContent = text
-                    return textNode
-                })
+            midNode = document.createElement('span')
+            midNode.textContent = node.nodeValue.slice(start, end)
+            midNode.className = `${targetClass} ${this.className}`
+            midNode.dataset.method = `${targetMethod}`
         }
         if (end !== 0 && node.nodeValue) {
             endNode = document.createTextNode(node.nodeValue.slice(end))
@@ -182,10 +186,8 @@ export default class IntroTour {
         if (startNode) {
             fragment.appendChild(startNode)
         }
-        if (midNodes) {
-            midNodes.forEach((item) => {
-                fragment.appendChild(item)
-            })
+        if (midNode) {
+            fragment.appendChild(midNode)
         }
         if (endNode) {
             fragment.appendChild(endNode)
@@ -213,7 +215,11 @@ export default class IntroTour {
                 if (node === endContainer && endOffset !== 0) {
                     endSliceOffset = endOffset
                 }
-                this.replaceTextNodes(node, startSliceOffset, endSliceOffset)
+                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark)
+                const selection = window.getSelection()
+                if (selection) {
+                    selection.removeAllRanges()
+                }
             })
         }
     }
@@ -221,5 +227,9 @@ export default class IntroTour {
     // TODO:完善功能
     private annotate = () => {
         this.successHandler('annotate')
+    }
+
+    private introTourMarkCancel = () => {
+        this.successHandler('markCancel')
     }
 }
