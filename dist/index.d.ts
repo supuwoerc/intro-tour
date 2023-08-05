@@ -50,6 +50,7 @@ declare class IntroTour {
     private onMouseup;
     private onMousedown;
     private showTooltip;
+    private getTextNodesInRange;
     private copy;
     private mark;
     private annotate;

@@ -138,6 +138,21 @@ export default class IntroTour {
         this.root.style.setProperty('--intro-tour-h', `${height}px`)
         this.root.style.setProperty('--intro-tour-z', `1`)
         this.tippyInstance?.show()
+        logUtil.log(range)
+        this.range = range
+    }
+
+    private getTextNodesInRange(range: Range) {
+        const textNodes: Node[] = []
+        const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+            acceptNode: (node) => {
+                return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+            },
+        })
+        while (treeWalker.nextNode()) {
+            textNodes.push(treeWalker.currentNode)
+        }
+        return textNodes
     }
 
     private copy = () => {
@@ -148,6 +163,10 @@ export default class IntroTour {
     // TODO:完善功能
     private mark = () => {
         this.successHandler('mark')
+        if (this.range) {
+            const textNodes = this.getTextNodesInRange(this.range)
+            logUtil.log(textNodes)
+        }
     }
 
     // TODO:完善功能
