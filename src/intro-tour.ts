@@ -138,7 +138,6 @@ export default class IntroTour {
         this.root.style.setProperty('--intro-tour-h', `${height}px`)
         this.root.style.setProperty('--intro-tour-z', `1`)
         this.tippyInstance?.show()
-        logUtil.log(range)
         this.range = range
     }
 
@@ -149,10 +148,50 @@ export default class IntroTour {
                 return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
             },
         })
+        const { currentNode } = treeWalker
+        if (currentNode.nodeType === Node.TEXT_NODE && range.intersectsNode(currentNode)) {
+            textNodes.push(currentNode)
+        }
         while (treeWalker.nextNode()) {
             textNodes.push(treeWalker.currentNode)
         }
         return textNodes
+    }
+
+    private replaceTextNodes(node: Node, start: number, end: number) {
+        const fragment = document.createDocumentFragment()
+        let startNode: Node | null = null
+        let midNodes: HTMLSpanElement[] | null = null
+        let endNode: Node | null = null
+        if (start !== 0 && node.nodeValue) {
+            startNode = document.createTextNode(node.nodeValue.slice(0, start))
+        }
+        if (node.nodeValue) {
+            midNodes = node.nodeValue
+                .slice(start, end)
+                .split('')
+                .map((text) => {
+                    const textNode = document.createElement('span')
+                    textNode.className = 'intro-tour-mark-text'
+                    textNode.textContent = text
+                    return textNode
+                })
+        }
+        if (end !== 0 && node.nodeValue) {
+            endNode = document.createTextNode(node.nodeValue.slice(end))
+        }
+        if (startNode) {
+            fragment.appendChild(startNode)
+        }
+        if (midNodes) {
+            midNodes.forEach((item) => {
+                fragment.appendChild(item)
+            })
+        }
+        if (endNode) {
+            fragment.appendChild(endNode)
+        }
+        node.parentNode?.replaceChild(fragment, node)
     }
 
     private copy = () => {
@@ -165,7 +204,18 @@ export default class IntroTour {
         this.successHandler('mark')
         if (this.range) {
             const textNodes = this.getTextNodesInRange(this.range)
-            logUtil.log(textNodes)
+            const { startContainer, endContainer, startOffset, endOffset } = this.range
+            textNodes.forEach((node) => {
+                let startSliceOffset = 0
+                let endSliceOffset = node.nodeValue?.length ?? 0
+                if (node === startContainer && startOffset !== 0) {
+                    startSliceOffset = startOffset
+                }
+                if (node === endContainer && endOffset !== 0) {
+                    endSliceOffset = endOffset
+                }
+                this.replaceTextNodes(node, startSliceOffset, endSliceOffset)
+            })
         }
     }
 
