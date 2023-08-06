@@ -28,3 +28,26 @@ export enum ReplaceNodeMethod {
     color = 'introTourColorCancel',
     bold = 'introTourBoldCancel',
 }
+
+export enum ReplaceNodeTag {
+    mark = 'mid',
+    light = 'lid',
+    color = 'cid',
+    bold = 'bid',
+    comment = 'cmid',
+}
+
+export enum ReplaceNodeTagPrefix {
+    mark = '_intro_tour_mark_',
+    light = '_intro_tour_light_',
+    color = '_intro_tour_color_',
+    bold = '_intro_tour_bold_',
+}
+
+export interface Status {
+    isMark: boolean
+    isColor: boolean
+    isLight: boolean
+    isBold: boolean
+    isComment: boolean
+}

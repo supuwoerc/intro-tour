@@ -63,6 +63,7 @@
         "@rollup/plugin-node-resolve": "^15.0.2",
         "@rollup/plugin-replace": "^5.0.2",
         "@types/jest": "^29.5.1",
+        "@types/lodash-es": "^4.17.8",
         "@typescript-eslint/eslint-plugin": "^5.59.2",
         "@typescript-eslint/parser": "^5.59.2",
         "add": "^2.0.6",
@@ -102,6 +103,7 @@
     "dependencies": {
         "intro.js": "^7.0.1",
         "localforage": "^1.10.0",
+        "lodash-es": "^4.17.21",
         "tippy.js": "^6.3.7"
     }
 }

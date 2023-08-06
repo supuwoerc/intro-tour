@@ -4,6 +4,13 @@ interface InitOptions {
     warnHandler?: (message: string) => void;
     successHandler?: (message: string) => void;
 }
+interface Status {
+    isMark: boolean;
+    isColor: boolean;
+    isLight: boolean;
+    isBold: boolean;
+    isComment: boolean;
+}
 
 /**
  * @class
@@ -51,7 +58,14 @@ declare class IntroTour {
      * @description 气泡内容依赖的元素
      */
     private tools;
+    /**
+     * @description 当前要操作的对象元素tag（划线等操作后的页面元素tag）
+     */
+    private checkedElementTag;
+    get checkElements(): Element[];
+    get status(): Status;
     constructor(options?: InitOptions);
+    private generateTooltip;
     private initTooltip;
     private initEvent;
     private onMouseup;
@@ -61,8 +75,8 @@ declare class IntroTour {
     private replaceTextNodes;
     private copy;
     private mark;
-    private annotate;
     private introTourMarkCancel;
+    private annotate;
 }
 
 export { IntroTour as default };

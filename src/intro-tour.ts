@@ -1,8 +1,9 @@
 import tippy, { Instance } from 'tippy.js'
+import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
 import { domParse } from './utils'
-import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod } from './constant'
+import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
  * @class
@@ -66,6 +67,32 @@ export default class IntroTour {
      */
     private tools: HTMLElement = document.createElement('div')
 
+    /**
+     * @description 当前要操作的对象元素tag（划线等操作后的页面元素tag）
+     */
+    private checkedElementTag: Partial<Record<ReplaceNodeTag, string>> = {}
+
+    get checkElements() {
+        const keys = Object.keys(this.checkedElementTag)
+        const eles = keys.reduce((prev, cur) => {
+            prev.push(...Array.from(document.querySelectorAll(`[data-${cur}='${this.checkedElementTag[cur]}']`)))
+            return prev
+        }, [] as Array<Element>)
+        logUtil.log(eles)
+        return eles
+    }
+
+    get status(): Status {
+        const keys = Object.keys(this.checkedElementTag)
+        return {
+            isMark: keys.includes(ReplaceNodeTag.mark),
+            isColor: keys.includes(ReplaceNodeTag.color),
+            isLight: keys.includes(ReplaceNodeTag.light),
+            isBold: keys.includes(ReplaceNodeTag.bold),
+            isComment: keys.includes(ReplaceNodeTag.comment),
+        }
+    }
+
     constructor(options: InitOptions = {}) {
         if (window.introTour) {
             throw new Error('plugin has been initialized. Do not call it again')
@@ -89,9 +116,16 @@ export default class IntroTour {
         window.introTour = this
     }
 
+    private generateTooltip() {
+        const htmlTemplate = template(tooltip)
+        const renderTemplate = htmlTemplate(this.status)
+        this.tools.innerHTML = ''
+        this.tools.appendChild(domParse(renderTemplate))
+    }
+
     private initTooltip = () => {
         this.root.classList.add('intro-tour-outer-container')
-        this.tools.appendChild(domParse(tooltip))
+        this.generateTooltip()
         document.body.appendChild(this.root)
         this.tippyInstance = tippy(this.root, {
             content: this.tools,
@@ -111,6 +145,8 @@ export default class IntroTour {
 
     private onMouseup = () => {
         const selection = window.getSelection()
+        logUtil.log(Object.values(this.status))
+        logUtil.log(Object.values(this.status).some(Boolean))
         if (selection && !selection.isCollapsed) {
             const range = selection.getRangeAt(0)
             const selectTextLength = range.toString().length
@@ -118,6 +154,13 @@ export default class IntroTour {
                 this.warnHandler('range is collapsed')
             } else {
                 this.range = range.cloneRange()
+                this.showTooltip(this.range)
+            }
+        } else if (Object.values(this.status).some(Boolean)) {
+            logUtil.log(2)
+            this.generateTooltip()
+            this.tippyInstance?.setContent(this.tools)
+            if (this.range) {
                 this.showTooltip(this.range)
             }
         } else {
@@ -128,12 +171,20 @@ export default class IntroTour {
     private onMousedown = (e: MouseEvent) => {
         const target = e.target as HTMLElement
         const method = target.dataset?.method ?? ''
+        const customDataTag = Object.keys(target.dataset).filter((item) => item !== 'method') as ReplaceNodeTag[]
         const isInnerChild = this.tools.contains(target)
-        const isMarkCell = method === 'introTourMarkCancel'
-        if (isInnerChild || isMarkCell) {
+        const tagRange = Object.values(ReplaceNodeTag)
+        const isEditedCell = customDataTag.some((i) => tagRange.includes(i))
+        this.checkedElementTag = {}
+        if (isInnerChild) {
             if (this.customEvents[method]) {
                 this[method]()
             }
+        } else if (isEditedCell) {
+            this.range = document.createRange()
+            customDataTag.forEach((item) => {
+                this.checkedElementTag[item] = target.dataset[item]
+            })
         }
         this.tippyInstance?.hide()
         this.root.style.setProperty('--intro-tour-z', `-1`)
@@ -167,10 +218,11 @@ export default class IntroTour {
         return textNodes
     }
 
-    private replaceTextNodes(node: Node, start: number, end: number, type: ActionType) {
+    private replaceTextNodes(node: Node, start: number, end: number, type: ActionType, id: string) {
         const fragment = document.createDocumentFragment()
         const targetClass = ReplaceNodeClass[type]
         const targetMethod = ReplaceNodeMethod[type]
+        const targetTag = ReplaceNodeTag[type]
         let startNode: Node | null = null
         let midNode: HTMLSpanElement | null = null
         let endNode: Node | null = null
@@ -182,6 +234,7 @@ export default class IntroTour {
             midNode.textContent = node.nodeValue.slice(start, end)
             midNode.className = `${targetClass} ${this.className}`
             midNode.dataset.method = `${targetMethod}`
+            midNode.dataset[targetTag] = `${id}`
         }
         if (end !== 0 && node.nodeValue) {
             endNode = document.createTextNode(node.nodeValue.slice(end))
@@ -203,12 +256,11 @@ export default class IntroTour {
         this.successHandler('copy')
     }
 
-    // TODO:完善功能
     private mark = () => {
-        this.successHandler('mark')
         if (this.range) {
             const textNodes = this.getTextNodesInRange(this.range)
             const { startContainer, endContainer, startOffset, endOffset } = this.range
+            const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             textNodes.forEach((node) => {
                 let startSliceOffset = 0
                 let endSliceOffset = node.nodeValue?.length ?? 0
@@ -218,21 +270,23 @@ export default class IntroTour {
                 if (node === endContainer && endOffset !== 0) {
                     endSliceOffset = endOffset
                 }
-                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark)
+                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
                 const selection = window.getSelection()
                 if (selection) {
                     selection.removeAllRanges()
                 }
+                this.successHandler('mark')
             })
         }
+    }
+
+    private introTourMarkCancel = () => {
+        // const range = document.createRange()
+        this.successHandler('markcancel')
     }
 
     // TODO:完善功能
     private annotate = () => {
         this.successHandler('annotate')
-    }
-
-    private introTourMarkCancel = () => {
-        this.successHandler('markCancel')
     }
 }

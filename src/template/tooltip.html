@@ -1,23 +1,23 @@
 <div class="tool-content">
     <div data-method="mark">
         <i class="iconfont icon-underline"></i>
-        <div>划线</div>
+        <div><%= isMark ? "取消划线":"划线" %></div>
     </div>
     <div data-method="color">
         <i class="iconfont icon-font-colors"></i>
-        <div>颜色</div>
+        <div><%= isColor ? "重置颜色":"颜色" %></div>
     </div>
     <div data-method="light">
         <i class="iconfont icon-bg-colors"></i>
-        <div>高亮</div>
+        <div><%= isLight ? "取消高亮":"高亮" %></div>
     </div>
     <div data-method="bold">
         <i class="iconfont icon-bold"></i>
-        <div>加粗</div>
+        <div><%= isBold ? "取消加粗":"加粗" %></div>
     </div>
     <div data-method="annotate">
         <i class="iconfont icon-comment"></i>
-        <div>标注</div>
+        <div><%= isComment ? "取消标注":"标注" %></div>
     </div>
     <div data-method="copy">
         <i class="iconfont icon-file-copy"></i>
