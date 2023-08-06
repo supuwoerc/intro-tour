@@ -111,14 +111,17 @@ export default class IntroTour {
 
     private onMouseup = () => {
         const selection = window.getSelection()
-        if (selection) {
+        if (selection && !selection.isCollapsed) {
             const range = selection.getRangeAt(0)
-            if (range.collapsed) {
+            const selectTextLength = range.toString().length
+            if (range.collapsed || selectTextLength === 0) {
                 this.warnHandler('range is collapsed')
             } else {
                 this.range = range.cloneRange()
                 this.showTooltip(this.range)
             }
+        } else {
+            this.tippyInstance?.hide()
         }
     }
 
