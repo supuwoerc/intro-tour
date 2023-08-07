@@ -1,21 +1,21 @@
 <div class="tool-content">
-    <div data-method="mark">
+    <div data-method=<%= isMark? "introTourMarkCancel" : "mark" %>>
         <i class="iconfont icon-underline"></i>
         <div><%= isMark ? "取消划线":"划线" %></div>
     </div>
-    <div data-method="color">
+    <div data-method=<%= isColor? "introTourColorCancel" : "color" %>>
         <i class="iconfont icon-font-colors"></i>
         <div><%= isColor ? "重置颜色":"颜色" %></div>
     </div>
-    <div data-method="light">
+    <div data-method=<%= isLight? "introTourLightCancel" : "light" %>>
         <i class="iconfont icon-bg-colors"></i>
         <div><%= isLight ? "取消高亮":"高亮" %></div>
     </div>
-    <div data-method="bold">
+    <div data-method=<%= isLight? "introTourBoldCancel" : "bold" %>>
         <i class="iconfont icon-bold"></i>
         <div><%= isBold ? "取消加粗":"加粗" %></div>
     </div>
-    <div data-method="annotate">
+    <div data-method=<%= isComment? "introTourCommentCancel" : "comment" %>>
         <i class="iconfont icon-comment"></i>
         <div><%= isComment ? "取消标注":"标注" %></div>
     </div>

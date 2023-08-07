@@ -27,6 +27,7 @@ export enum ReplaceNodeMethod {
     light = 'introTourLightCancel',
     color = 'introTourColorCancel',
     bold = 'introTourBoldCancel',
+    comment = 'introTourCommentCancel',
 }
 
 export enum ReplaceNodeTag {

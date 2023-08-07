@@ -78,13 +78,13 @@ export default class IntroTour {
             prev.push(...Array.from(document.querySelectorAll(`[data-${cur}='${this.checkedElementTag[cur]}']`)))
             return prev
         }, [] as Array<Element>)
-        logUtil.log(eles)
         return eles
     }
 
     get status(): Status {
         const keys = Object.keys(this.checkedElementTag)
         return {
+            // FIXME:修复状态，当包含未mark元素显示了取消划线
             isMark: keys.includes(ReplaceNodeTag.mark),
             isColor: keys.includes(ReplaceNodeTag.color),
             isLight: keys.includes(ReplaceNodeTag.light),
@@ -145,8 +145,6 @@ export default class IntroTour {
 
     private onMouseup = () => {
         const selection = window.getSelection()
-        logUtil.log(Object.values(this.status))
-        logUtil.log(Object.values(this.status).some(Boolean))
         if (selection && !selection.isCollapsed) {
             const range = selection.getRangeAt(0)
             const selectTextLength = range.toString().length
@@ -157,11 +155,18 @@ export default class IntroTour {
                 this.showTooltip(this.range)
             }
         } else if (Object.values(this.status).some(Boolean)) {
-            logUtil.log(2)
             this.generateTooltip()
             this.tippyInstance?.setContent(this.tools)
             if (this.range) {
-                this.showTooltip(this.range)
+                const startContainer = this.checkElements[0].firstChild
+                const endContainer = this.checkElements[this.checkElements.length - 1].lastChild
+                if (startContainer && endContainer) {
+                    this.range.setStart(startContainer, 0)
+                    this.range.setEnd(endContainer, endContainer?.nodeValue?.length ?? 0)
+                    window.getSelection()?.removeAllRanges()
+                    window.getSelection()?.addRange(this.range)
+                    this.showTooltip(this.range)
+                }
             }
         } else {
             this.tippyInstance?.hide()
@@ -202,16 +207,23 @@ export default class IntroTour {
         this.range = range
     }
 
-    private getTextNodesInRange(range: Range) {
+    private getTextNodesInRange(range: Range, ...filters: ReplaceNodeClass[]) {
         const textNodes: Node[] = []
+        const callback = (node: Node) => {
+            let isTarget = filters.length === 0
+            if (filters.length && node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
+                const parentNodeClassList = (node.parentNode as Element).classList
+                isTarget = filters.some((item) => parentNodeClassList.contains(item))
+            }
+            const result = range.intersectsNode(node) && isTarget
+            return result ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+        }
         const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
-            acceptNode: (node) => {
-                return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
-            },
+            acceptNode: callback,
         })
         do {
             const { currentNode } = treeWalker
-            if (currentNode.nodeType === Node.TEXT_NODE && range.intersectsNode(currentNode)) {
+            if (currentNode.nodeType === Node.TEXT_NODE && callback(currentNode) === NodeFilter.FILTER_ACCEPT) {
                 textNodes.push(currentNode)
             }
         } while (treeWalker.nextNode())
@@ -253,30 +265,35 @@ export default class IntroTour {
 
     private copy = () => {
         document.execCommand('copy')
+        window.getSelection()?.removeAllRanges()
         this.successHandler('copy')
     }
 
     private mark = () => {
         if (this.range) {
             const textNodes = this.getTextNodesInRange(this.range)
+            const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
             const { startContainer, endContainer, startOffset, endOffset } = this.range
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             textNodes.forEach((node) => {
-                let startSliceOffset = 0
-                let endSliceOffset = node.nodeValue?.length ?? 0
-                if (node === startContainer && startOffset !== 0) {
-                    startSliceOffset = startOffset
+                // TODO：重复的划线元素需要移除标签
+                if (!markedtTextNodes.includes(node)) {
+                    let startSliceOffset = 0
+                    let endSliceOffset = node.nodeValue?.length ?? 0
+                    if (node === startContainer && startOffset !== 0) {
+                        startSliceOffset = startOffset
+                    }
+                    if (node === endContainer && endOffset !== 0) {
+                        endSliceOffset = endOffset
+                    }
+                    this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
                 }
-                if (node === endContainer && endOffset !== 0) {
-                    endSliceOffset = endOffset
-                }
-                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
-                const selection = window.getSelection()
-                if (selection) {
-                    selection.removeAllRanges()
-                }
-                this.successHandler('mark')
             })
+            const selection = window.getSelection()
+            if (selection) {
+                selection.removeAllRanges()
+            }
+            this.successHandler('mark')
         }
     }
 
@@ -286,7 +303,7 @@ export default class IntroTour {
     }
 
     // TODO:完善功能
-    private annotate = () => {
-        this.successHandler('annotate')
+    private comment = () => {
+        this.successHandler('comment')
     }
 }

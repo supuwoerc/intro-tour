@@ -76,7 +76,7 @@ declare class IntroTour {
     private copy;
     private mark;
     private introTourMarkCancel;
-    private annotate;
+    private comment;
 }
 
 export { IntroTour as default };
