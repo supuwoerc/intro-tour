@@ -25,3 +25,21 @@ export function domParse(...templates: string[]) {
     }
     return documentFragment
 }
+
+export function getPrevTextNode(node: Node) {
+    const prevNodes: Node[] = []
+    while (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
+        prevNodes.push(node.previousSibling)
+        node = node.previousSibling
+    }
+    return prevNodes
+}
+
+export function getNextTextNode(node: Node) {
+    const nextNodes: Node[] = []
+    while (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE) {
+        nextNodes.push(node.nextSibling)
+        node = node.nextSibling
+    }
+    return nextNodes
+}
