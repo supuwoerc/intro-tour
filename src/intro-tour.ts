@@ -282,7 +282,6 @@ export default class IntroTour {
             const selection = window.getSelection()
             const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
             const textNodes = this.getTextNodesInRange(this.range)
-            logUtil.log(textNodes)
             const { startContainer, endContainer, startOffset, endOffset } = this.range
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             textNodes.forEach((node) => {
@@ -309,8 +308,6 @@ export default class IntroTour {
     }
 
     private introTourMarkCancel = () => {
-        logUtil.log(this.checkedElementTag)
-        logUtil.log(this.checkElements)
         this.checkElements.forEach((ele) => {
             if (ele.classList.length === 1 && ele.firstChild) {
                 ele.parentNode?.replaceChild(ele.firstChild, ele)
