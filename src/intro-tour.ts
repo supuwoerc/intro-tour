@@ -84,7 +84,6 @@ export default class IntroTour {
     get status(): Status {
         const keys = Object.keys(this.checkedElementTag)
         return {
-            // FIXME:修复状态，当包含未mark元素显示了取消划线
             isMark: keys.includes(ReplaceNodeTag.mark),
             isColor: keys.includes(ReplaceNodeTag.color),
             isLight: keys.includes(ReplaceNodeTag.light),
@@ -143,6 +142,11 @@ export default class IntroTour {
         document.addEventListener('mouseup', this.onMouseup)
     }
 
+    private setTippyContent() {
+        this.generateTooltip()
+        this.tippyInstance?.setContent(this.tools)
+    }
+
     private onMouseup = () => {
         const selection = window.getSelection()
         if (selection && !selection.isCollapsed) {
@@ -152,11 +156,11 @@ export default class IntroTour {
                 this.warnHandler('range is collapsed')
             } else {
                 this.range = range.cloneRange()
+                this.setTippyContent()
                 this.showTooltip(this.range)
             }
         } else if (Object.values(this.status).some(Boolean)) {
-            this.generateTooltip()
-            this.tippyInstance?.setContent(this.tools)
+            this.setTippyContent()
             if (this.range) {
                 const startContainer = this.checkElements[0].firstChild
                 const endContainer = this.checkElements[this.checkElements.length - 1].lastChild
@@ -180,13 +184,13 @@ export default class IntroTour {
         const isInnerChild = this.tools.contains(target)
         const tagRange = Object.values(ReplaceNodeTag)
         const isEditedCell = customDataTag.some((i) => tagRange.includes(i))
-        this.checkedElementTag = {}
         if (isInnerChild) {
             if (this.customEvents[method]) {
                 this[method]()
             }
         } else if (isEditedCell) {
             this.range = document.createRange()
+            this.checkedElementTag = {}
             customDataTag.forEach((item) => {
                 this.checkedElementTag[item] = target.dataset[item]
             })
@@ -236,17 +240,19 @@ export default class IntroTour {
         const targetMethod = ReplaceNodeMethod[type]
         const targetTag = ReplaceNodeTag[type]
         let startNode: Node | null = null
-        let midNode: HTMLSpanElement | null = null
+        let midNode: HTMLSpanElement | Node | null = null
         let endNode: Node | null = null
         if (start !== 0 && node.nodeValue) {
             startNode = document.createTextNode(node.nodeValue.slice(0, start))
         }
         if (node.nodeValue) {
-            midNode = document.createElement('span')
-            midNode.textContent = node.nodeValue.slice(start, end)
-            midNode.className = `${targetClass} ${this.className}`
-            midNode.dataset.method = `${targetMethod}`
-            midNode.dataset[targetTag] = `${id}`
+            if ([ActionType.mark].includes(type)) {
+                midNode = document.createElement('span')
+                midNode.textContent = node.nodeValue.slice(start, end)
+                ;(midNode as HTMLSpanElement).className = `${targetClass} ${this.className}`
+                ;(midNode as HTMLSpanElement).dataset.method = `${targetMethod}`
+                ;(midNode as HTMLSpanElement).dataset[targetTag] = `${id}`
+            }
         }
         if (end !== 0 && node.nodeValue) {
             endNode = document.createTextNode(node.nodeValue.slice(end))
@@ -271,12 +277,13 @@ export default class IntroTour {
 
     private mark = () => {
         if (this.range) {
-            const textNodes = this.getTextNodesInRange(this.range)
+            const selection = window.getSelection()
             const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
+            const textNodes = this.getTextNodesInRange(this.range)
+            logUtil.log(textNodes)
             const { startContainer, endContainer, startOffset, endOffset } = this.range
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             textNodes.forEach((node) => {
-                // TODO：重复的划线元素需要移除标签
                 if (!markedtTextNodes.includes(node)) {
                     let startSliceOffset = 0
                     let endSliceOffset = node.nodeValue?.length ?? 0
@@ -287,9 +294,11 @@ export default class IntroTour {
                         endSliceOffset = endOffset
                     }
                     this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
+                } else if (node.parentElement) {
+                    // eslint-disable-next-line no-param-reassign
+                    node.parentElement.dataset[ReplaceNodeTag.mark] = uuid
                 }
             })
-            const selection = window.getSelection()
             if (selection) {
                 selection.removeAllRanges()
             }
@@ -298,7 +307,15 @@ export default class IntroTour {
     }
 
     private introTourMarkCancel = () => {
-        // const range = document.createRange()
+        logUtil.log(this.checkedElementTag)
+        logUtil.log(this.checkElements)
+        this.checkElements.forEach((ele) => {
+            if (ele.classList.length === 1 && ele.firstChild) {
+                ele.parentNode?.replaceChild(ele.firstChild, ele)
+            } else {
+                ele.classList.remove(ReplaceNodeClass.mark)
+            }
+        })
         this.successHandler('markcancel')
     }
 

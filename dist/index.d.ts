@@ -68,10 +68,12 @@ declare class IntroTour {
     private generateTooltip;
     private initTooltip;
     private initEvent;
+    private setTippyContent;
     private onMouseup;
     private onMousedown;
     private showTooltip;
     private getTextNodesInRange;
+    private freeTextNode;
     private replaceTextNodes;
     private copy;
     private mark;
