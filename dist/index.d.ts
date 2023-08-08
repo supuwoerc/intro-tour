@@ -73,7 +73,6 @@ declare class IntroTour {
     private onMousedown;
     private showTooltip;
     private getTextNodesInRange;
-    private freeTextNode;
     private replaceTextNodes;
     private copy;
     private mark;
