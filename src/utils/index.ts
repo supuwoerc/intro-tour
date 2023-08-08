@@ -1,3 +1,4 @@
+import { ReplaceNodeClass } from '@/constant'
 import logUtil from '@/utils/log'
 /**
  * 产生uuid
@@ -26,18 +27,26 @@ export function domParse(...templates: string[]) {
     return documentFragment
 }
 
-export function getPrevTextNode(node: Node) {
+export function getPrevMarkedNode(node: Node) {
     const prevNodes: Node[] = []
-    while (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
+    while (
+        node.previousSibling &&
+        node.previousSibling.nodeType === Node.ELEMENT_NODE &&
+        (node as Element).classList.contains(ReplaceNodeClass.mark)
+    ) {
         prevNodes.push(node.previousSibling)
         node = node.previousSibling
     }
     return prevNodes
 }
 
-export function getNextTextNode(node: Node) {
+export function getNextMarkedNode(node: Node) {
     const nextNodes: Node[] = []
-    while (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE) {
+    while (
+        node.nextSibling &&
+        node.nextSibling.nodeType === Node.ELEMENT_NODE &&
+        (node as Element).classList.contains(ReplaceNodeClass.mark)
+    ) {
         nextNodes.push(node.nextSibling)
         node = node.nextSibling
     }

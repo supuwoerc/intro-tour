@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { domParse, getNextTextNode, getPrevTextNode } from './utils'
+import { domParse, getNextMarkedNode, getPrevMarkedNode } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -212,7 +212,7 @@ export default class IntroTour {
         this.tippyInstance?.show()
     }
 
-    private getTextNodesInRange(range: Range, ...filters: ReplaceNodeClass[]) {
+    private getTextNodesInRangeByContainer(range: Range, container: Node, ...filters: ReplaceNodeClass[]) {
         const textNodes: Node[] = []
         const callback = (node: Node) => {
             let isTarget = filters.length === 0
@@ -223,7 +223,7 @@ export default class IntroTour {
             const result = range.intersectsNode(node) && isTarget
             return result ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
         }
-        const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+        const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
             acceptNode: callback,
         })
         do {
@@ -233,6 +233,10 @@ export default class IntroTour {
             }
         } while (treeWalker.nextNode())
         return textNodes
+    }
+
+    private getTextNodesInRange(range: Range, ...filters: ReplaceNodeClass[]) {
+        return this.getTextNodesInRangeByContainer(range, range.commonAncestorContainer, ...filters)
     }
 
     private replaceTextNodes(node: Node, start: number, end: number, type: ActionType, id: string) {
@@ -282,54 +286,51 @@ export default class IntroTour {
         }
     }
 
-    private mergeTextNode(node: Node) {
-        const fragment = document.createDocumentFragment()
-        const prevNodes = getPrevTextNode(node)
-        const nextNodes = getNextTextNode(node)
-        const continuousNodes = [...prevNodes, node, ...nextNodes]
-        const textContent = continuousNodes.reduce((prev, cur) => {
-            return `${prev}${cur.nodeValue}`
-        }, '')
-        fragment.appendChild(document.createTextNode(textContent))
-        continuousNodes.forEach((node, index) => {
-            if (index < continuousNodes.length - 1) {
-                node.parentNode?.removeChild(node)
-            } else {
-                node.parentNode?.replaceChild(fragment, node)
-            }
-        })
+    private mergeMarkedNode(node: Node) {
+        // const fragment = document.createDocumentFragment()
+        if (node.parentElement) {
+            const prevNodes = getPrevMarkedNode(node.parentElement)
+            const nextNodes = getNextMarkedNode(node.parentElement)
+            const continuousNodes = [...prevNodes, node, ...nextNodes]
+            logUtil.log(continuousNodes)
+        }
+        // const textContent = continuousNodes.reduce((prev, cur) => {
+        //     return `${prev}${cur.nodeValue}`
+        // }, '')
+        // fragment.appendChild(document.createTextNode(textContent))
+        // continuousNodes.forEach((node, index) => {
+        //     if (index < continuousNodes.length - 1) {
+        //         node.parentNode?.removeChild(node)
+        //     } else {
+        //         node.parentNode?.replaceChild(fragment, node)
+        //     }
+        // })
     }
 
     private mark = () => {
         if (this.range) {
             const { startContainer, endContainer, startOffset, endOffset } = this.range
-            logUtil.log(startContainer)
-            logUtil.log(endContainer)
-            logUtil.log(startOffset)
-            logUtil.log(endOffset)
             const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
-            markedtTextNodes.forEach((node) => {
-                this.freeTextNode(node)
-                this.mergeTextNode(node)
-            })
             const selection = window.getSelection()
-            logUtil.log(startContainer)
-            logUtil.log(endContainer)
-            logUtil.log(startOffset)
-            logUtil.log(endOffset)
             const textNodes = this.getTextNodesInRange(this.range)
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
-            logUtil.log(textNodes)
             textNodes.forEach((node) => {
-                let startSliceOffset = 0
-                let endSliceOffset = node.nodeValue?.length ?? 0
-                if (node === startContainer && startOffset !== 0) {
-                    startSliceOffset = startOffset
+                if (!markedtTextNodes.includes(node)) {
+                    let startSliceOffset = 0
+                    let endSliceOffset = node.nodeValue?.length ?? 0
+                    if (node === startContainer && startOffset !== 0) {
+                        startSliceOffset = startOffset
+                    }
+                    if (node === endContainer && endOffset !== 0) {
+                        endSliceOffset = endOffset
+                    }
+                    this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
+                } else if (node.parentElement) {
+                    node.parentElement.dataset[ReplaceNodeTag.mark] = uuid
                 }
-                if (node === endContainer && endOffset !== 0) {
-                    endSliceOffset = endOffset
-                }
-                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
+            })
+            markedtTextNodes.forEach((node) => {
+                this.mergeMarkedNode(node)
             })
             if (selection) {
                 selection.removeAllRanges()

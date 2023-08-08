@@ -72,11 +72,12 @@ declare class IntroTour {
     private onMouseup;
     private onMousedown;
     private showTooltip;
+    private getTextNodesInRangeByContainer;
     private getTextNodesInRange;
     private replaceTextNodes;
     private copy;
     private freeTextNode;
-    private mergeTextNode;
+    private mergeMarkedNode;
     private mark;
     private introTourMarkCancel;
     private comment;
