@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { domParse } from './utils'
+import { domParse, getNextTextNode, getPrevTextNode } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -210,7 +210,6 @@ export default class IntroTour {
         this.root.style.setProperty('--intro-tour-h', `${height}px`)
         this.root.style.setProperty('--intro-tour-z', `1`)
         this.tippyInstance?.show()
-        this.range = range
     }
 
     private getTextNodesInRange(range: Range, ...filters: ReplaceNodeClass[]) {
@@ -277,28 +276,60 @@ export default class IntroTour {
         this.successHandler('copy')
     }
 
+    private freeTextNode(node: Node) {
+        if (node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
+            node.parentNode.parentNode?.replaceChild(node, node.parentNode)
+        }
+    }
+
+    private mergeTextNode(node: Node) {
+        const fragment = document.createDocumentFragment()
+        const prevNodes = getPrevTextNode(node)
+        const nextNodes = getNextTextNode(node)
+        const continuousNodes = [...prevNodes, node, ...nextNodes]
+        const textContent = continuousNodes.reduce((prev, cur) => {
+            return `${prev}${cur.nodeValue}`
+        }, '')
+        fragment.appendChild(document.createTextNode(textContent))
+        continuousNodes.forEach((node, index) => {
+            if (index < continuousNodes.length - 1) {
+                node.parentNode?.removeChild(node)
+            } else {
+                node.parentNode?.replaceChild(fragment, node)
+            }
+        })
+    }
+
     private mark = () => {
         if (this.range) {
-            const selection = window.getSelection()
-            const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
-            const textNodes = this.getTextNodesInRange(this.range)
             const { startContainer, endContainer, startOffset, endOffset } = this.range
+            logUtil.log(startContainer)
+            logUtil.log(endContainer)
+            logUtil.log(startOffset)
+            logUtil.log(endOffset)
+            const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
+            markedtTextNodes.forEach((node) => {
+                this.freeTextNode(node)
+                this.mergeTextNode(node)
+            })
+            const selection = window.getSelection()
+            logUtil.log(startContainer)
+            logUtil.log(endContainer)
+            logUtil.log(startOffset)
+            logUtil.log(endOffset)
+            const textNodes = this.getTextNodesInRange(this.range)
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
+            logUtil.log(textNodes)
             textNodes.forEach((node) => {
-                if (!markedtTextNodes.includes(node)) {
-                    let startSliceOffset = 0
-                    let endSliceOffset = node.nodeValue?.length ?? 0
-                    if (node === startContainer && startOffset !== 0) {
-                        startSliceOffset = startOffset
-                    }
-                    if (node === endContainer && endOffset !== 0) {
-                        endSliceOffset = endOffset
-                    }
-                    this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
-                } else if (node.parentElement) {
-                    // eslint-disable-next-line no-param-reassign
-                    node.parentElement.dataset[ReplaceNodeTag.mark] = uuid
+                let startSliceOffset = 0
+                let endSliceOffset = node.nodeValue?.length ?? 0
+                if (node === startContainer && startOffset !== 0) {
+                    startSliceOffset = startOffset
                 }
+                if (node === endContainer && endOffset !== 0) {
+                    endSliceOffset = endOffset
+                }
+                this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
             })
             if (selection) {
                 selection.removeAllRanges()
