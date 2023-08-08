@@ -11,7 +11,8 @@
         "no-console": "error",
         "class-methods-use-this": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "no-shadow": "off"
+        "no-shadow": "off",
+        "no-param-reassign": "off"
     },
     "settings": {
         "import/resolver": {
