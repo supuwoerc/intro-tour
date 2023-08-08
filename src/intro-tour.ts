@@ -184,13 +184,15 @@ export default class IntroTour {
         const isInnerChild = this.tools.contains(target)
         const tagRange = Object.values(ReplaceNodeTag)
         const isEditedCell = customDataTag.some((i) => tagRange.includes(i))
+        if (!isInnerChild) {
+            this.checkedElementTag = {}
+        }
         if (isInnerChild) {
             if (this.customEvents[method]) {
                 this[method]()
             }
         } else if (isEditedCell) {
             this.range = document.createRange()
-            this.checkedElementTag = {}
             customDataTag.forEach((item) => {
                 this.checkedElementTag[item] = target.dataset[item]
             })
