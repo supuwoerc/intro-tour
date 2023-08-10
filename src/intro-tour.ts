@@ -272,14 +272,7 @@ export default class IntroTour {
         return result
     }
 
-    private replaceTextNodes(
-        node: Node,
-        start: number,
-        end: number,
-        type: ActionType,
-        id: string,
-        replace = true
-    ): DocumentFragment | void {
+    private replaceTextNodes(node: Node, start: number, end: number, type: ActionType, id: string) {
         const fragment = document.createDocumentFragment()
         const targetClass = ReplaceNodeClass[type]
         const targetMethod = ReplaceNodeMethod[type]
@@ -311,10 +304,7 @@ export default class IntroTour {
         if (endNode) {
             fragment.appendChild(endNode)
         }
-        if (replace) {
-            node.parentNode?.replaceChild(fragment, node)
-        }
-        return fragment
+        node.parentNode?.replaceChild(fragment, node)
     }
 
     private mark = () => {
@@ -335,30 +325,17 @@ export default class IntroTour {
                     })
                     key?.normalize()
                     logUtil.log(key)
-                    // value.forEach((item) => {
-                    //     const { node } = item
-                    //     let startSliceOffset = 0
-                    //     let endSliceOffset = node.nodeValue?.length ?? 0
-                    //     if (node === startContainer && startOffset !== 0) {
-                    //         startSliceOffset = startOffset
-                    //     }
-                    //     if (node === endContainer && endOffset !== 0) {
-                    //         endSliceOffset = endOffset
-                    //     }
-                    //     const fragment = this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid, false)
-                    //     const residue =
-                    // })
-                    // freeResult.forEach((node) => {
-                    //     let startSliceOffset = 0
-                    //     let endSliceOffset = node.nodeValue?.length ?? 0
-                    //     if (node === startContainer && startOffset !== 0) {
-                    //         startSliceOffset = startOffset
-                    //     }
-                    //     if (node === endContainer && endOffset !== 0) {
-                    //         endSliceOffset = endOffset
-                    //     }
-                    //     this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
-                    // })
+                    logUtil.log(key?.textContent)
+                    logUtil.log(key?.childNodes)
+                    if (key?.childNodes[0]) {
+                        const wrapEndOffset = (this.range?.toString().length ?? 0) + startOffset
+                        logUtil.log(startOffset)
+                        logUtil.log(this.range?.toString(), this.range?.toString().length)
+                        logUtil.log(endOffset)
+                        logUtil.log(wrapEndOffset)
+                        // FIXME：修复offset问题
+                        this.replaceTextNodes(key?.childNodes[0], startOffset, wrapEndOffset, ActionType.mark, uuid)
+                    }
                 })
             } else {
                 textNodes.forEach((node) => {
