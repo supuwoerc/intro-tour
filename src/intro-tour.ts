@@ -239,7 +239,47 @@ export default class IntroTour {
         return this.getTextNodesInRangeByContainer(range, range.commonAncestorContainer, ...filters)
     }
 
-    private replaceTextNodes(node: Node, start: number, end: number, type: ActionType, id: string) {
+    private copy = () => {
+        document.execCommand('copy')
+        window.getSelection()?.removeAllRanges()
+        this.successHandler('copy')
+    }
+
+    private freeTextNode(node: Node) {
+        if (node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
+            node.parentNode.parentNode?.replaceChild(node, node.parentNode)
+        }
+    }
+
+    private getMarkNodesParentMap(nodes: Node[]) {
+        const result: Map<Node | null, Array<{ node: Node; isMarked: boolean }>> = new Map()
+        for (let index = 0; index < nodes.length; index += 1) {
+            const node = nodes[index]
+            const isMarked = node.parentElement?.classList.contains(ReplaceNodeClass.mark) ?? false
+            const desc = {
+                node,
+                isMarked,
+            }
+            if (isMarked) {
+                const temp = node.parentNode?.parentNode
+                if (temp) {
+                    result.set(temp, result.get(temp)?.concat(desc) ?? [desc])
+                }
+            } else {
+                result.set(node.parentNode, result.get(node.parentNode)?.concat(desc) ?? [desc])
+            }
+        }
+        return result
+    }
+
+    private replaceTextNodes(
+        node: Node,
+        start: number,
+        end: number,
+        type: ActionType,
+        id: string,
+        replace = true
+    ): DocumentFragment | void {
         const fragment = document.createDocumentFragment()
         const targetClass = ReplaceNodeClass[type]
         const targetMethod = ReplaceNodeMethod[type]
@@ -271,13 +311,10 @@ export default class IntroTour {
         if (endNode) {
             fragment.appendChild(endNode)
         }
-        node.parentNode?.replaceChild(fragment, node)
-    }
-
-    private copy = () => {
-        document.execCommand('copy')
-        window.getSelection()?.removeAllRanges()
-        this.successHandler('copy')
+        if (replace) {
+            node.parentNode?.replaceChild(fragment, node)
+        }
+        return fragment
     }
 
     private mark = () => {
@@ -287,8 +324,44 @@ export default class IntroTour {
             const selection = window.getSelection()
             const textNodes = this.getTextNodesInRange(this.range)
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
-            textNodes.forEach((node) => {
-                if (!markedtTextNodes.includes(node)) {
+            if (markedtTextNodes.length) {
+                const map = this.getMarkNodesParentMap(textNodes)
+                logUtil.log(map)
+                map.forEach((value, key) => {
+                    value.forEach((item) => {
+                        if (item.isMarked) {
+                            this.freeTextNode(item.node)
+                        }
+                    })
+                    key?.normalize()
+                    logUtil.log(key)
+                    // value.forEach((item) => {
+                    //     const { node } = item
+                    //     let startSliceOffset = 0
+                    //     let endSliceOffset = node.nodeValue?.length ?? 0
+                    //     if (node === startContainer && startOffset !== 0) {
+                    //         startSliceOffset = startOffset
+                    //     }
+                    //     if (node === endContainer && endOffset !== 0) {
+                    //         endSliceOffset = endOffset
+                    //     }
+                    //     const fragment = this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid, false)
+                    //     const residue =
+                    // })
+                    // freeResult.forEach((node) => {
+                    //     let startSliceOffset = 0
+                    //     let endSliceOffset = node.nodeValue?.length ?? 0
+                    //     if (node === startContainer && startOffset !== 0) {
+                    //         startSliceOffset = startOffset
+                    //     }
+                    //     if (node === endContainer && endOffset !== 0) {
+                    //         endSliceOffset = endOffset
+                    //     }
+                    //     this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
+                    // })
+                })
+            } else {
+                textNodes.forEach((node) => {
                     let startSliceOffset = 0
                     let endSliceOffset = node.nodeValue?.length ?? 0
                     if (node === startContainer && startOffset !== 0) {
@@ -298,10 +371,8 @@ export default class IntroTour {
                         endSliceOffset = endOffset
                     }
                     this.replaceTextNodes(node, startSliceOffset, endSliceOffset, ActionType.mark, uuid)
-                } else if (node.parentElement) {
-                    node.parentElement.dataset[ReplaceNodeTag.mark] = uuid
-                }
-            })
+                })
+            }
             if (selection) {
                 selection.removeAllRanges()
             }

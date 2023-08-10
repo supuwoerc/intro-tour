@@ -74,8 +74,10 @@ declare class IntroTour {
     private showTooltip;
     private getTextNodesInRangeByContainer;
     private getTextNodesInRange;
-    private replaceTextNodes;
     private copy;
+    private freeTextNode;
+    private getMarkNodesParentMap;
+    private replaceTextNodes;
     private mark;
     private introTourMarkCancel;
     private comment;
