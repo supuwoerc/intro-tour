@@ -76,8 +76,6 @@ declare class IntroTour {
     private getTextNodesInRange;
     private replaceTextNodes;
     private copy;
-    private freeTextNode;
-    private mergeMarkedNode;
     private mark;
     private introTourMarkCancel;
     private comment;

@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { domParse, getNextMarkedNode, getPrevMarkedNode } from './utils'
+import { domParse } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -280,33 +280,6 @@ export default class IntroTour {
         this.successHandler('copy')
     }
 
-    private freeTextNode(node: Node) {
-        if (node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
-            node.parentNode.parentNode?.replaceChild(node, node.parentNode)
-        }
-    }
-
-    private mergeMarkedNode(node: Node) {
-        // const fragment = document.createDocumentFragment()
-        if (node.parentElement) {
-            const prevNodes = getPrevMarkedNode(node.parentElement)
-            const nextNodes = getNextMarkedNode(node.parentElement)
-            const continuousNodes = [...prevNodes, node, ...nextNodes]
-            logUtil.log(continuousNodes)
-        }
-        // const textContent = continuousNodes.reduce((prev, cur) => {
-        //     return `${prev}${cur.nodeValue}`
-        // }, '')
-        // fragment.appendChild(document.createTextNode(textContent))
-        // continuousNodes.forEach((node, index) => {
-        //     if (index < continuousNodes.length - 1) {
-        //         node.parentNode?.removeChild(node)
-        //     } else {
-        //         node.parentNode?.replaceChild(fragment, node)
-        //     }
-        // })
-    }
-
     private mark = () => {
         if (this.range) {
             const { startContainer, endContainer, startOffset, endOffset } = this.range
@@ -328,9 +301,6 @@ export default class IntroTour {
                 } else if (node.parentElement) {
                     node.parentElement.dataset[ReplaceNodeTag.mark] = uuid
                 }
-            })
-            markedtTextNodes.forEach((node) => {
-                this.mergeMarkedNode(node)
             })
             if (selection) {
                 selection.removeAllRanges()
