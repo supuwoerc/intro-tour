@@ -5253,7 +5253,6 @@
                 }
               });
               key?.normalize();
-              logUtil.log(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset);
               this.replaceTextNodes(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset, ActionType.mark, uuid);
             }
           });
