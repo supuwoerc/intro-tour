@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { calculateRelativeOffset, domParse } from './utils'
+import { calculateRelativeStartOffset, domParse, getLengthInElement } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -329,8 +329,8 @@ export default class IntroTour {
                     })
                     const realIndex = index - 1 < 0 ? 0 : index - 1
                     if (this.range && key?.childNodes[realIndex]) {
-                        const relativeStartOffset = calculateRelativeOffset(this.range, key?.childNodes[realIndex])
-                        const relativeEndOffset = (this.range?.toString().length ?? 0) + relativeStartOffset
+                        const relativeStartOffset = calculateRelativeStartOffset(this.range, key?.childNodes[realIndex])
+                        const relativeEndOffset = getLengthInElement(this.range, key as HTMLElement) + relativeStartOffset
                         value.forEach((item) => {
                             if (item.isMarked) {
                                 this.freeTextNode(item.node)
@@ -374,5 +374,15 @@ export default class IntroTour {
     // TODO:完善功能
     private comment = () => {
         this.successHandler('comment')
+    }
+
+    // 序列化存储
+    private serialize() {
+        logUtil.log('serialize')
+    }
+
+    // 反序列化存储
+    private deSerialize() {
+        logUtil.log('deSerialize')
     }
 }

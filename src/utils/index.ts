@@ -26,11 +26,11 @@ export function domParse(...templates: string[]) {
     return documentFragment
 }
 /**
- * 获取startOffset在commonAncestorContainer中的offset
+ * 获取startOffset在targetNode的offset
  * @param range range
- * @returns startOffset在commonAncestorContainer中的offset
+ * @returns 获取startOffset在targetNode的offset
  */
-export function calculateRelativeOffset(range: Range, target: Node) {
+export function calculateRelativeStartOffset(range: Range, target: Node) {
     let offset = range.startOffset
     let node = range.startContainer
     if (node === target) {
@@ -39,14 +39,38 @@ export function calculateRelativeOffset(range: Range, target: Node) {
     while (node && node !== target) {
         if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
             offset += node.previousSibling.textContent?.length ?? 0
-        } else if (node.previousSibling) {
-            offset += 1
         }
         if (!node.previousSibling && node.parentNode) {
             node = node.parentNode
         } else if (node.previousSibling) {
             node = node.previousSibling
         }
+        if (node === range.commonAncestorContainer) {
+            return offset
+        }
     }
     return offset
+}
+
+export function getLengthInElement(range: Range, element: HTMLElement) {
+    if (!range.intersectsNode(element)) return 0
+    let length = 0
+    if (element.contains(range.startContainer) && element.contains(range.endContainer)) {
+        length = range.toString().length
+        return length
+    }
+    const tempRange = document.createRange()
+    if (element.contains(range.startContainer)) {
+        tempRange.setStart(range.startContainer, range.startOffset)
+        tempRange.setEndAfter(element)
+        length = tempRange.toString().length
+        return length
+    }
+    if (element.contains(range.endContainer)) {
+        tempRange.setStartBefore(element)
+        tempRange.setEnd(range.endContainer, range.endOffset)
+        length = tempRange.toString().length
+        return length
+    }
+    return 0
 }

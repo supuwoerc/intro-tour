@@ -4859,7 +4859,7 @@
     }
     return documentFragment;
   }
-  function calculateRelativeOffset(range, target) {
+  function calculateRelativeStartOffset(range, target) {
     let offset = range.startOffset;
     let node = range.startContainer;
     if (node === target) {
@@ -4868,16 +4868,40 @@
     while (node && node !== target) {
       if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
         offset += node.previousSibling.textContent?.length ?? 0;
-      } else if (node.previousSibling) {
-        offset += 1;
       }
       if (!node.previousSibling && node.parentNode) {
         node = node.parentNode;
       } else if (node.previousSibling) {
         node = node.previousSibling;
       }
+      if (node === range.commonAncestorContainer) {
+        return offset;
+      }
     }
     return offset;
+  }
+  function getLengthInElement(range, element) {
+    if (!range.intersectsNode(element))
+      return 0;
+    let length = 0;
+    if (element.contains(range.startContainer) && element.contains(range.endContainer)) {
+      length = range.toString().length;
+      return length;
+    }
+    const tempRange = document.createRange();
+    if (element.contains(range.startContainer)) {
+      tempRange.setStart(range.startContainer, range.startOffset);
+      tempRange.setEndAfter(element);
+      length = tempRange.toString().length;
+      return length;
+    }
+    if (element.contains(range.endContainer)) {
+      tempRange.setStartBefore(element);
+      tempRange.setEnd(range.endContainer, range.endOffset);
+      length = tempRange.toString().length;
+      return length;
+    }
+    return 0;
   }
 
   var ActionType;
@@ -5216,8 +5240,8 @@
             });
             const realIndex = index - 1 < 0 ? 0 : index - 1;
             if (this.range && key?.childNodes[realIndex]) {
-              const relativeStartOffset = calculateRelativeOffset(this.range, key?.childNodes[realIndex]);
-              const relativeEndOffset = (this.range?.toString().length ?? 0) + relativeStartOffset;
+              const relativeStartOffset = calculateRelativeStartOffset(this.range, key?.childNodes[realIndex]);
+              const relativeEndOffset = getLengthInElement(this.range, key) + relativeStartOffset;
               value.forEach((item) => {
                 if (item.isMarked) {
                   this.freeTextNode(item.node);
@@ -5260,6 +5284,14 @@
     comment = () => {
       this.successHandler("comment");
     };
+    // 序列化存储
+    serialize() {
+      logUtil.log("serialize");
+    }
+    // 反序列化存储
+    deSerialize() {
+      logUtil.log("deSerialize");
+    }
   }
 
   return IntroTour;

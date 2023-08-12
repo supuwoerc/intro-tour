@@ -81,6 +81,8 @@ declare class IntroTour {
     private mark;
     private introTourMarkCancel;
     private comment;
+    private serialize;
+    private deSerialize;
 }
 
 export { IntroTour as default };
