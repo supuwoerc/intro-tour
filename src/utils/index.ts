@@ -51,7 +51,12 @@ export function calculateRelativeStartOffset(range: Range, target: Node) {
     }
     return offset
 }
-
+/**
+ * range在元素内占的长度
+ * @param range range
+ * @param element 元素
+ * @returns range在元素内占的长度
+ */
 export function getLengthInElement(range: Range, element: HTMLElement) {
     if (!range.intersectsNode(element)) return 0
     let length = 0
@@ -70,6 +75,11 @@ export function getLengthInElement(range: Range, element: HTMLElement) {
         tempRange.setStartBefore(element)
         tempRange.setEnd(range.endContainer, range.endOffset)
         length = tempRange.toString().length
+        return length
+    }
+    tempRange.selectNodeContents(element)
+    if (range.compareBoundaryPoints(Range.START_TO_START, tempRange) < 0 && range.compareBoundaryPoints(Range.END_TO_END, tempRange) > 0) {
+        length = element.textContent ? element.textContent.length : 0
         return length
     }
     return 0

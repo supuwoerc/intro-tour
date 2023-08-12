@@ -4895,6 +4895,11 @@ function getLengthInElement(range, element) {
     length = tempRange.toString().length;
     return length;
   }
+  tempRange.selectNodeContents(element);
+  if (range.compareBoundaryPoints(Range.START_TO_START, tempRange) < 0 && range.compareBoundaryPoints(Range.END_TO_END, tempRange) > 0) {
+    length = element.textContent ? element.textContent.length : 0;
+    return length;
+  }
   return 0;
 }
 
@@ -5242,6 +5247,7 @@ class IntroTour {
               }
             });
             key?.normalize();
+            logUtil.log(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset);
             this.replaceTextNodes(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset, ActionType.mark, uuid);
           }
         });
