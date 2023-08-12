@@ -5135,9 +5135,12 @@
       window.getSelection()?.removeAllRanges();
       this.successHandler("copy");
     };
-    freeTextNode(node) {
+    freeTextNode(node, normalize = false) {
       if (node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
         node.parentNode.parentNode?.replaceChild(node, node.parentNode);
+        if (normalize) {
+          node.parentNode.parentNode?.normalize();
+        }
       }
     }
     getMarkNodesParentMap(nodes) {
@@ -5212,8 +5215,6 @@
               return false;
             });
             const realIndex = index - 1 < 0 ? 0 : index - 1;
-            logUtil.log(realIndex);
-            logUtil.log(key?.childNodes[index - 1]);
             if (this.range && key?.childNodes[realIndex]) {
               const relativeStartOffset = calculateRelativeOffset(this.range, key?.childNodes[realIndex]);
               const relativeEndOffset = (this.range?.toString().length ?? 0) + relativeStartOffset;
@@ -5248,7 +5249,7 @@
     introTourMarkCancel = () => {
       this.checkElements.forEach((ele) => {
         if (ele.classList.length === 1 && ele.firstChild) {
-          ele.parentNode?.replaceChild(ele.firstChild, ele);
+          this.freeTextNode(ele.firstChild, true);
         } else {
           ele.classList.remove(ReplaceNodeClass.mark);
         }

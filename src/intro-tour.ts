@@ -245,9 +245,12 @@ export default class IntroTour {
         this.successHandler('copy')
     }
 
-    private freeTextNode(node: Node) {
+    private freeTextNode(node: Node, normalize = false) {
         if (node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
             node.parentNode.parentNode?.replaceChild(node, node.parentNode)
+            if (normalize) {
+                node.parentNode.parentNode?.normalize()
+            }
         }
     }
 
@@ -360,7 +363,7 @@ export default class IntroTour {
     private introTourMarkCancel = () => {
         this.checkElements.forEach((ele) => {
             if (ele.classList.length === 1 && ele.firstChild) {
-                ele.parentNode?.replaceChild(ele.firstChild, ele)
+                this.freeTextNode(ele.firstChild, true)
             } else {
                 ele.classList.remove(ReplaceNodeClass.mark)
             }
