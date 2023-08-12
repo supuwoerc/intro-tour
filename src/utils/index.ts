@@ -25,3 +25,28 @@ export function domParse(...templates: string[]) {
     }
     return documentFragment
 }
+/**
+ * 获取startOffset在commonAncestorContainer中的offset
+ * @param range range
+ * @returns startOffset在commonAncestorContainer中的offset
+ */
+export function calculateRelativeOffset(range: Range, target: Node) {
+    let offset = range.startOffset
+    let node = range.startContainer
+    if (node === target) {
+        return offset
+    }
+    while (node && node !== target) {
+        if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
+            offset += node.previousSibling.textContent?.length ?? 0
+        } else if (node.previousSibling) {
+            offset += 1
+        }
+        if (!node.previousSibling && node.parentNode) {
+            node = node.parentNode
+        } else if (node.previousSibling) {
+            node = node.previousSibling
+        }
+    }
+    return offset
+}

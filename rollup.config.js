@@ -78,7 +78,11 @@ export default [
             },
         ],
         external: [],
-        plugins: [...plugins, terser(), cleaner({ targets: ['./dist/'], silent: false })],
+        plugins: [
+            ...plugins,
+            // terser()
+            cleaner({ targets: ['./dist/'], silent: false }),
+        ],
     })),
     {
         input: 'src/intro-tour.ts',

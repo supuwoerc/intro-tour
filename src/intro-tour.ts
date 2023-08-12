@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { domParse } from './utils'
+import { calculateRelativeOffset, domParse } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -316,18 +316,25 @@ export default class IntroTour {
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             if (markedtTextNodes.length) {
                 const map = this.getMarkNodesParentMap(textNodes)
-                logUtil.log(this.range?.toString())
-                const wrapEndOffset = (this.range?.toString().length ?? 0) + startOffset
                 map.forEach((value, key) => {
-                    value.forEach((item) => {
-                        if (item.isMarked) {
-                            this.freeTextNode(item.node)
+                    const firstMarked = value.find((item) => item.isMarked)
+                    const index = Array.prototype.findIndex.call(key?.childNodes, (n) => {
+                        if ((n as Element).classList?.contains(ReplaceNodeClass.mark)) {
+                            return (n as Node).firstChild === firstMarked?.node
                         }
+                        return false
                     })
-                    key?.normalize()
-                    if (key?.childNodes[0]) {
-                        // FIXME：修复offset问题
-                        this.replaceTextNodes(key?.childNodes[0], startOffset, wrapEndOffset, ActionType.mark, uuid)
+                    const realIndex = index - 1 < 0 ? 0 : index - 1
+                    if (this.range && key?.childNodes[realIndex]) {
+                        const relativeStartOffset = calculateRelativeOffset(this.range, key?.childNodes[realIndex])
+                        const relativeEndOffset = (this.range?.toString().length ?? 0) + relativeStartOffset
+                        value.forEach((item) => {
+                            if (item.isMarked) {
+                                this.freeTextNode(item.node)
+                            }
+                        })
+                        key?.normalize()
+                        this.replaceTextNodes(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset, ActionType.mark, uuid)
                     }
                 })
             } else {
