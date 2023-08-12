@@ -316,7 +316,8 @@ export default class IntroTour {
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             if (markedtTextNodes.length) {
                 const map = this.getMarkNodesParentMap(textNodes)
-                logUtil.log(map)
+                logUtil.log(this.range?.toString())
+                const wrapEndOffset = (this.range?.toString().length ?? 0) + startOffset
                 map.forEach((value, key) => {
                     value.forEach((item) => {
                         if (item.isMarked) {
@@ -324,15 +325,7 @@ export default class IntroTour {
                         }
                     })
                     key?.normalize()
-                    logUtil.log(key)
-                    logUtil.log(key?.textContent)
-                    logUtil.log(key?.childNodes)
                     if (key?.childNodes[0]) {
-                        const wrapEndOffset = (this.range?.toString().length ?? 0) + startOffset
-                        logUtil.log(startOffset)
-                        logUtil.log(this.range?.toString(), this.range?.toString().length)
-                        logUtil.log(endOffset)
-                        logUtil.log(wrapEndOffset)
                         // FIXME：修复offset问题
                         this.replaceTextNodes(key?.childNodes[0], startOffset, wrapEndOffset, ActionType.mark, uuid)
                     }
