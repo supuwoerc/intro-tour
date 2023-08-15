@@ -163,7 +163,7 @@ export default class IntroTour {
             this.setTippyContent()
             if (this.range) {
                 const startContainer = this.checkElements[0]?.firstChild
-                const endContainer = this.checkElements[this.checkElements.length - 1].lastChild
+                const endContainer = this.checkElements[this.checkElements.length - 1]?.lastChild
                 if (startContainer && endContainer) {
                     this.range.setStart(startContainer, 0)
                     this.range.setEnd(endContainer, endContainer?.nodeValue?.length ?? 0)
