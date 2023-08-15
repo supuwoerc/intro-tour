@@ -26,6 +26,14 @@ export function domParse(...templates: string[]) {
     return documentFragment
 }
 /**
+ * 判断一个节点是否是空白节点
+ * @param node 节点
+ * @returns 判断是否是空白节点
+ */
+export function isWhitespaceNode(node: Node) {
+    return node.nodeType === Node.TEXT_NODE && /^\s+$/.test(node.nodeValue ?? '')
+}
+/**
  * 获取startOffset在targetNode的offset
  * @param range range
  * @returns 获取startOffset在targetNode的offset
@@ -33,11 +41,14 @@ export function domParse(...templates: string[]) {
 export function calculateRelativeStartOffset(range: Range, target: Node) {
     let offset = range.startOffset
     let node = range.startContainer
+    if (isWhitespaceNode(node)) {
+        offset = 0
+    }
     if (node === target) {
         return offset
     }
     while (node && node !== target) {
-        if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
+        if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE && !isWhitespaceNode(node.previousSibling)) {
             offset += node.previousSibling.textContent?.length ?? 0
         }
         if (!node.previousSibling && node.parentNode) {
@@ -45,12 +56,13 @@ export function calculateRelativeStartOffset(range: Range, target: Node) {
         } else if (node.previousSibling) {
             node = node.previousSibling
         }
-        if (node === range.commonAncestorContainer) {
+        if (node === range.commonAncestorContainer || node === document) {
             return offset
         }
     }
     return offset
 }
+
 /**
  * range在元素内占的长度
  * @param range range

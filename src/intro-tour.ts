@@ -2,7 +2,7 @@ import tippy, { Instance } from 'tippy.js'
 import { template, uniqueId } from 'lodash-es'
 import logUtil from '@/utils/log'
 import tooltip from '@/template/tooltip.html'
-import { calculateRelativeStartOffset, domParse, getLengthInElement } from './utils'
+import { calculateRelativeStartOffset, domParse, getLengthInElement, isWhitespaceNode } from './utils'
 import { ActionType, InitOptions, ReplaceNodeClass, ReplaceNodeMethod, ReplaceNodeTag, ReplaceNodeTagPrefix, Status } from './constant'
 
 /**
@@ -215,6 +215,9 @@ export default class IntroTour {
     private getTextNodesInRangeByContainer(range: Range, container: Node, ...filters: ReplaceNodeClass[]) {
         const textNodes: Node[] = []
         const callback = (node: Node) => {
+            if (isWhitespaceNode(node)) {
+                return NodeFilter.FILTER_REJECT
+            }
             let isTarget = filters.length === 0
             if (filters.length && node.parentNode && node.parentNode.nodeType === Node.ELEMENT_NODE) {
                 const parentNodeClassList = (node.parentNode as Element).classList
@@ -228,7 +231,11 @@ export default class IntroTour {
         })
         do {
             const { currentNode } = treeWalker
-            if (currentNode.nodeType === Node.TEXT_NODE && callback(currentNode) === NodeFilter.FILTER_ACCEPT) {
+            if (
+                currentNode.nodeType === Node.TEXT_NODE &&
+                currentNode.nodeValue?.length &&
+                callback(currentNode) === NodeFilter.FILTER_ACCEPT
+            ) {
                 textNodes.push(currentNode)
             }
         } while (treeWalker.nextNode())
@@ -312,9 +319,9 @@ export default class IntroTour {
 
     private mark = () => {
         if (this.range) {
+            const selection = window.getSelection()
             const { startContainer, endContainer, startOffset, endOffset } = this.range
             const markedtTextNodes = this.getTextNodesInRange(this.range, ReplaceNodeClass.mark)
-            const selection = window.getSelection()
             const textNodes = this.getTextNodesInRange(this.range)
             const uuid = uniqueId(ReplaceNodeTagPrefix.mark)
             if (markedtTextNodes.length) {
@@ -329,14 +336,14 @@ export default class IntroTour {
                     })
                     const realIndex = index - 1 < 0 ? 0 : index - 1
                     if (this.range && key?.childNodes[realIndex]) {
-                        const relativeStartOffset = calculateRelativeStartOffset(this.range, key?.childNodes[realIndex])
-                        const relativeEndOffset = getLengthInElement(this.range, key as HTMLElement) + relativeStartOffset
                         value.forEach((item) => {
                             if (item.isMarked) {
                                 this.freeTextNode(item.node)
                             }
                         })
                         key?.normalize()
+                        const relativeStartOffset = calculateRelativeStartOffset(this.range, key?.childNodes[realIndex])
+                        const relativeEndOffset = getLengthInElement(this.range, key as HTMLElement) + relativeStartOffset
                         this.replaceTextNodes(key?.childNodes[realIndex], relativeStartOffset, relativeEndOffset, ActionType.mark, uuid)
                     }
                 })
