@@ -62,6 +62,10 @@ declare class IntroTour {
      * @description 当前要操作的对象元素tag（划线等操作后的页面元素tag）
      */
     private checkedElementTag;
+    /**
+     * @description 当前要操作的对象元素tag（划线等操作后的页面元素tag）
+     */
+    static instance: IntroTour | null;
     get checkElements(): Element[];
     get status(): Status;
     constructor(options?: InitOptions);

@@ -72,6 +72,11 @@ export default class IntroTour {
      */
     private checkedElementTag: Partial<Record<ReplaceNodeTag, string>> = {}
 
+    /**
+     * @description 当前要操作的对象元素tag（划线等操作后的页面元素tag）
+     */
+    static instance: IntroTour | null = null
+
     get checkElements() {
         const keys = Object.keys(this.checkedElementTag)
         const eles = keys.reduce((prev, cur) => {
@@ -93,8 +98,8 @@ export default class IntroTour {
     }
 
     constructor(options: InitOptions = {}) {
-        if (window.introTour) {
-            throw new Error('plugin has been initialized. Do not call it again')
+        if (IntroTour.instance) {
+            return IntroTour.instance
         }
         const { errorHandler, warnHandler, successHandler, className } = options
         if (errorHandler) {
@@ -111,8 +116,7 @@ export default class IntroTour {
         }
         this.initEvent()
         this.initTooltip()
-        logUtil.log('plugin initialization is complete!')
-        window.introTour = this
+        IntroTour.instance = this
     }
 
     private generateTooltip() {
